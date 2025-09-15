@@ -1,0 +1,11 @@
+-- db/init.sql
+CREATE DATABASE IF NOT EXISTS travel_bucket CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE travel_bucket;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
