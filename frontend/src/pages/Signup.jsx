@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "../lib/api";
 import { useNavigate, Link } from "react-router-dom";
+import { Globe2 } from "lucide-react";
 
 export default function Signup() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
@@ -43,7 +44,7 @@ export default function Signup() {
         <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
           <div className="text-center mb-8">
             <div className="inline-block p-3 bg-blue-100 rounded-full mb-4">
-              <span className="text-4xl">🌍</span>
+              <Globe2 className="w-10 h-10 text-blue-600" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Start Your Journey</h2>
             <p className="text-gray-600">Create your travel bucket list account</p>

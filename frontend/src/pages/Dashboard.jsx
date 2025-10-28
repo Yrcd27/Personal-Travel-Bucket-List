@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { api } from "../lib/api";
+import { Plane, MapPin, CheckCircle2, Clock, Plus, Search, Edit2, Trash2, X } from "lucide-react";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -167,7 +168,7 @@ export default function Dashboard() {
                 <p className="text-blue-100 mb-1">Total Destinations</p>
                 <p className="text-4xl font-bold">{stats.total}</p>
               </div>
-              <div className="text-5xl opacity-80">🗺️</div>
+              <MapPin className="w-12 h-12 opacity-80" />
             </div>
           </div>
 
@@ -177,7 +178,7 @@ export default function Dashboard() {
                 <p className="text-emerald-100 mb-1">Visited</p>
                 <p className="text-4xl font-bold">{stats.visited}</p>
               </div>
-              <div className="text-5xl opacity-80">✅</div>
+              <CheckCircle2 className="w-12 h-12 opacity-80" />
             </div>
           </div>
 
@@ -187,7 +188,7 @@ export default function Dashboard() {
                 <p className="text-amber-100 mb-1">Pending</p>
                 <p className="text-4xl font-bold">{stats.pending}</p>
               </div>
-              <div className="text-5xl opacity-80">⏳</div>
+              <Clock className="w-12 h-12 opacity-80" />
             </div>
           </div>
         </div>
@@ -241,9 +242,10 @@ export default function Dashboard() {
                 resetForm();
                 setShowAddModal(true);
               }}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 w-full md:w-auto"
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 w-full md:w-auto flex items-center gap-2 justify-center"
             >
-              + Add Destination
+              <Plus className="w-5 h-5" />
+              Add Destination
             </button>
           </div>
         </div>
@@ -251,7 +253,7 @@ export default function Dashboard() {
         {/* Destinations Grid */}
         {filteredDestinations.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <div className="text-6xl mb-4">🌍</div>
+            <Plane className="w-24 h-24 mx-auto mb-4 text-gray-400" />
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
               No destinations yet
             </h3>
@@ -260,8 +262,9 @@ export default function Dashboard() {
             </p>
             <button
               onClick={() => setShowAddModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold inline-flex items-center gap-2"
             >
+              <Plus className="w-5 h-5" />
               Add Your First Destination
             </button>
           </div>
@@ -290,11 +293,11 @@ export default function Dashboard() {
                         {dest.destination}
                       </h3>
                       <p className="text-gray-600 flex items-center gap-1">
-                        <span>📍</span> {dest.country}
+                        <MapPin className="w-4 h-4" /> {dest.country}
                       </p>
                     </div>
                     {dest.visited && (
-                      <span className="text-2xl">✅</span>
+                      <CheckCircle2 className="w-6 h-6 text-emerald-500" />
                     )}
                   </div>
 
@@ -332,14 +335,16 @@ export default function Dashboard() {
                     <button
                       onClick={() => handleEdit(dest)}
                       className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition"
+                      title="Edit"
                     >
-                      Edit
+                      <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(dest.id)}
                       className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition"
+                      title="Delete"
                     >
-                      🗑️
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>

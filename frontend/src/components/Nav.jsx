@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { setToken } from "../lib/api";
+import { Plane, LayoutDashboard } from "lucide-react";
 
 function Nav() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -57,7 +58,7 @@ function Nav() {
             to="/" 
             className="flex items-center gap-2 text-xl font-bold text-gray-900 hover:text-blue-600 transition"
           >
-            <span className="text-2xl">✈️</span>
+            <Plane className="w-6 h-6" />
             <span className="hidden sm:inline">Travel Bucket List</span>
             <span className="sm:hidden">TBL</span>
           </Link>
@@ -68,13 +69,14 @@ function Nav() {
               <>
                 <Link 
                   to="/dashboard" 
-                  className={`px-4 py-2 rounded-lg font-medium transition ${
+                  className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
                     isActive("/dashboard")
                       ? "bg-blue-100 text-blue-700"
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
-                  📊 Dashboard
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
                 </Link>
                 <button 
                   onClick={handleLogout}
@@ -143,13 +145,14 @@ function Nav() {
                 <Link
                   to="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition ${
+                  className={`flex items-center gap-2 w-full text-left px-4 py-3 rounded-lg font-medium transition ${
                     isActive("/dashboard")
                       ? "bg-blue-100 text-blue-700"
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
-                  📊 Dashboard
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
                 </Link>
                 <button
                   onClick={handleLogout}

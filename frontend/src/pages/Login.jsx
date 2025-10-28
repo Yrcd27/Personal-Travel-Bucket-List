@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api, setToken } from "../lib/api";
 import { useNavigate, Link } from "react-router-dom";
+import { Plane } from "lucide-react";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -36,7 +37,7 @@ export default function Login() {
         <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
           <div className="text-center mb-8">
             <div className="inline-block p-3 bg-blue-100 rounded-full mb-4">
-              <span className="text-4xl">✈️</span>
+              <Plane className="w-10 h-10 text-blue-600" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
             <p className="text-gray-600">Sign in to continue your journey</p>
