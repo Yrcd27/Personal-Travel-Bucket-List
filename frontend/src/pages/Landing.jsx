@@ -2,39 +2,132 @@ import { Link } from "react-router-dom";
 
 export default function Landing() {
   return (
-    <main className="bg-gray-50 min-h-[calc(100vh-56px)]">
-      <section className="max-w-5xl mx-auto px-4 py-16 grid md:grid-cols-2 gap-8 items-center">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-            Plan, save, and track your dream trips
+    <main className="bg-gray-50">
+      {/* Hero Section with Background Image */}
+      <section className="relative min-h-[600px] flex items-center justify-center bg-gradient-to-br from-blue-900/90 via-blue-800/80 to-amber-900/70 overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-40"
+          style={{ 
+            backgroundImage: "url('/assets/Hero-bg.png')",
+            backgroundAttachment: "fixed"
+          }}
+        ></div>
+        
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-950/60 via-blue-900/50 to-amber-900/60"></div>
+        
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-5xl mx-auto px-4 py-20 text-center">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6 drop-shadow-lg animate-fade-in">
+            Your Journey Starts Here
           </h1>
-          <p className="mt-4 text-gray-600">
-            Keep a personal travel bucket list, log places you love, and never lose your ideas again.
+          <p className="text-xl md:text-2xl text-white/90 mb-4 max-w-3xl mx-auto drop-shadow-md">
+            Plan, save, and track your dream destinations
           </p>
-          <div className="mt-6 space-x-3">
-            <Link to="/signup" className="bg-blue-600 text-white px-5 py-2.5 rounded">
-              Get started
+          <p className="text-lg text-white/80 mb-10 max-w-2xl mx-auto">
+            Keep a personal travel bucket list, log places you love, and never lose your wanderlust inspiration again.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link 
+              to="/signup" 
+              className="group bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 flex items-center gap-2"
+            >
+              Start Your Adventure
+              <span className="group-hover:translate-x-1 transition-transform">→</span>
             </Link>
-            <Link to="/login" className="text-blue-600">
-              I already have an account
+            <Link 
+              to="/login" 
+              className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/20 hover:border-white/50 transition-all duration-300"
+            >
+              Sign In
             </Link>
           </div>
         </div>
-        <div className="bg-white shadow rounded-xl p-6">
-          <ul className="space-y-3">
-            <li className="flex items-start gap-3">
-              <span className="mt-1 h-2 w-2 rounded-full bg-blue-600"></span>
-              Create a list of destinations
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="mt-1 h-2 w-2 rounded-full bg-blue-600"></span>
-              Track visited places and notes
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="mt-1 h-2 w-2 rounded-full bg-blue-600"></span>
-              Sync across devices
-            </li>
-          </ul>
+      </section>
+
+      {/* Features Section */}
+      <section className="max-w-6xl mx-auto px-4 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">Everything You Need to Plan Your Travels</h2>
+          <p className="text-xl text-gray-600">Organize, track, and share your dream destinations</p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Feature 1 */}
+          <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+              <span className="text-3xl">🗺️</span>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Create Your List</h3>
+            <p className="text-gray-600 leading-relaxed">
+              Build your personalized bucket list of dream destinations. Add photos, notes, and priorities to each place you want to visit.
+            </p>
+          </div>
+
+          {/* Feature 2 */}
+          <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
+            <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+              <span className="text-3xl">✅</span>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Track Progress</h3>
+            <p className="text-gray-600 leading-relaxed">
+              Mark destinations as visited, add your memories, and watch your travel stats grow. Celebrate every journey completed!
+            </p>
+          </div>
+
+          {/* Feature 3 */}
+          <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+              <span className="text-3xl">🔒</span>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Secure & Private</h3>
+            <p className="text-gray-600 leading-relaxed">
+              Your travel plans are securely stored and accessible only to you. Sync across all your devices seamlessly.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="bg-gradient-to-br from-blue-600 to-blue-800 py-16">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
+            <div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">1000+</div>
+              <div className="text-blue-100">Dream Destinations</div>
+            </div>
+            <div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">500+</div>
+              <div className="text-blue-100">Happy Travelers</div>
+            </div>
+            <div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">195</div>
+              <div className="text-blue-100">Countries Covered</div>
+            </div>
+            <div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">24/7</div>
+              <div className="text-blue-100">Always Available</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Ready to Start Your Journey?
+          </h2>
+          <p className="text-xl text-gray-600 mb-10">
+            Join thousands of travelers who are making their travel dreams come true
+          </p>
+          <Link 
+            to="/signup" 
+            className="inline-block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-10 py-5 rounded-full font-bold text-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
+          >
+            Create Free Account
+          </Link>
         </div>
       </section>
     </main>
