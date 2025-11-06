@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Plane, MapPin, CheckCircle, Lock, TrendingUp, Users, Globe2, Clock, Facebook, Twitter, Instagram, Github } from "lucide-react";
+import { Plane, MapPin, CheckCircle, Lock, TrendingUp, Users, Globe2, Clock, Facebook, Twitter, Instagram, Github, ArrowRight } from "lucide-react";
 
 export default function Landing() {
   return (
@@ -37,7 +37,7 @@ export default function Landing() {
               className="group bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 flex items-center gap-2"
             >
               Start Your Adventure
-              <span className="group-hover:translate-x-1 transition-transform">→</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link 
               to="/login" 

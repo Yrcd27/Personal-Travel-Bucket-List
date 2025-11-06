@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { api } from "../lib/api";
 import { useNavigate, Link } from "react-router-dom";
-import { Globe2 } from "lucide-react";
+import { Globe2, ArrowLeft } from "lucide-react";
 
 export default function Signup() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
@@ -135,7 +135,7 @@ export default function Signup() {
         {/* Back to home */}
         <div className="text-center mt-6">
           <Link to="/" className="text-gray-600 hover:text-gray-900 text-sm">
-            ← Back to home
+            <ArrowLeft className="w-4 h-4 inline mr-1" />Back to home
           </Link>
         </div>
       </div>
