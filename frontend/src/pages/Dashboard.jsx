@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { api } from "../lib/api";
 import { Plane, MapPin, CheckCircle2, Clock, Plus, Search, Edit2, Trash2, X } from "lucide-react";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -9,6 +10,8 @@ export default function Dashboard() {
   const [destinations, setDestinations] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [deleteModal, setDeleteModal] = useState({ show: false, id: null, destination: '' });
+  const [visitedModal, setVisitedModal] = useState({ show: false, id: null, destination: '', visited: false });
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all"); // all, pending, visited
   const [formData, setFormData] = useState({
@@ -89,9 +92,12 @@ export default function Dashboard() {
   }
 
   function handleDelete(id) {
-    if (confirm("Are you sure you want to delete this destination?")) {
-      saveDestinations(destinations.filter((d) => d.id !== id));
-    }
+    saveDestinations(destinations.filter((d) => d.id !== id));
+    setDeleteModal({ show: false, id: null, destination: '' });
+  }
+
+  function showDeleteConfirmation(dest) {
+    setDeleteModal({ show: true, id: dest.id, destination: dest.destination });
   }
 
   function toggleVisited(id) {
@@ -99,6 +105,11 @@ export default function Dashboard() {
       d.id === id ? { ...d, visited: !d.visited } : d
     );
     saveDestinations(updated);
+    setVisitedModal({ show: false, id: null, destination: '', visited: false });
+  }
+
+  function showVisitedConfirmation(dest) {
+    setVisitedModal({ show: true, id: dest.id, destination: dest.destination, visited: dest.visited });
   }
 
   function resetForm() {
@@ -153,7 +164,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Welcome back, {user?.name}! ✈️
+            Welcome back, {user?.name}!
           </h1>
           <p className="text-gray-600 text-lg">
             Your personal travel bucket list dashboard
@@ -323,7 +334,7 @@ export default function Dashboard() {
 
                   <div className="flex gap-2">
                     <button
-                      onClick={() => toggleVisited(dest.id)}
+                      onClick={() => showVisitedConfirmation(dest)}
                       className={`flex-1 py-2 px-3 rounded-lg font-medium transition ${
                         dest.visited
                           ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -340,7 +351,7 @@ export default function Dashboard() {
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDelete(dest.id)}
+                      onClick={() => showDeleteConfirmation(dest)}
                       className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition"
                       title="Delete"
                     >
@@ -460,6 +471,26 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+      
+      <ConfirmationModal
+        isOpen={deleteModal.show}
+        onClose={() => setDeleteModal({ show: false, id: null, destination: '' })}
+        onConfirm={() => handleDelete(deleteModal.id)}
+        title="Delete Destination"
+        message={`Are you sure you want to delete "${deleteModal.destination}"? This action cannot be undone.`}
+        confirmText="Delete"
+        type="danger"
+      />
+      
+      <ConfirmationModal
+        isOpen={visitedModal.show}
+        onClose={() => setVisitedModal({ show: false, id: null, destination: '', visited: false })}
+        onConfirm={() => toggleVisited(visitedModal.id)}
+        title={visitedModal.visited ? "Unmark as Visited" : "Mark as Visited"}
+        message={`Are you sure you want to ${visitedModal.visited ? 'unmark' : 'mark'} "${visitedModal.destination}" as ${visitedModal.visited ? 'not visited' : 'visited'}?`}
+        confirmText={visitedModal.visited ? "Unmark" : "Mark Visited"}
+        type="info"
+      />
     </div>
   );
 }

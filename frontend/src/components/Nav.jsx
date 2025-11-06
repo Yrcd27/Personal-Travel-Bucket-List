@@ -3,10 +3,12 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { setToken } from "../lib/api";
 import { LayoutDashboard, Globe2 } from "lucide-react";
+import ConfirmationModal from "./ConfirmationModal";
 
 function Nav() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -41,6 +43,7 @@ function Nav() {
     setToken(null);
     setIsLoggedIn(false);
     setMobileMenuOpen(false);
+    setShowLogoutModal(false);
     navigate("/");
     
     // Dispatch event to notify other components
@@ -79,7 +82,7 @@ function Nav() {
                   Dashboard
                 </Link>
                 <button 
-                  onClick={handleLogout}
+                  onClick={() => setShowLogoutModal(true)}
                   className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-medium transition"
                 >
                   Log out
@@ -155,7 +158,7 @@ function Nav() {
                   Dashboard
                 </Link>
                 <button
-                  onClick={handleLogout}
+                  onClick={() => setShowLogoutModal(true)}
                   className="block w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-medium transition"
                 >
                   Log out
@@ -186,6 +189,16 @@ function Nav() {
           </div>
         )}
       </div>
+      
+      <ConfirmationModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
+        title="Confirm Logout"
+        message="Are you sure you want to log out? You'll need to sign in again to access your dashboard."
+        confirmText="Log Out"
+        type="warning"
+      />
     </nav>
   );
 }
