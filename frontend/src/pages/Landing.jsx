@@ -145,9 +145,9 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Brand Section */}
             <div className="space-y-4">
-              <div className="flex items-center gap-2 text-white">
-                <Plane className="w-8 h-8" />
-                <span className="text-xl font-bold">Travel Bucket List</span>
+              <div className="flex items-center gap-1 text-white">
+                <span className="text-xl font-bold">Travelogue</span>
+                <Globe2 className="w-8 h-8" />
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Your personal travel companion for planning, tracking, and achieving your dream destinations around the world.
@@ -266,7 +266,7 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-gray-400 text-sm text-center md:text-left">
-                © {new Date().getFullYear()} Travel Bucket List. All rights reserved.
+                © {new Date().getFullYear()} Travelogue. All rights reserved.
               </p>
               <div className="flex items-center gap-6">
                 <a href="#" className="text-gray-400 hover:text-white transition text-sm flex items-center gap-1">

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { setToken } from "../lib/api";
-import { Plane, LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, Globe2 } from "lucide-react";
 
 function Nav() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -56,11 +56,11 @@ function Nav() {
           {/* Logo */}
           <Link 
             to="/" 
-            className="flex items-center gap-2 text-xl font-bold text-gray-900 hover:text-blue-600 transition"
+            className="flex items-center gap-1 text-xl font-bold text-gray-900 hover:text-blue-600 transition"
           >
-            <Plane className="w-6 h-6" />
-            <span className="hidden sm:inline">Travel Bucket List</span>
-            <span className="sm:hidden">TBL</span>
+            <span className="hidden sm:inline">Travelogue</span>
+            <span className="sm:hidden">Travelogue</span>
+            <Globe2 className="w-6 h-6" />
           </Link>
 
           {/* Desktop Navigation */}
