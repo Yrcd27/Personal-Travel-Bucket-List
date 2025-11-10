@@ -50,6 +50,13 @@ pipeline {
                         echo "No existing containers to stop: ${e.getMessage()}"
                     }
                     
+                    try {
+                        sh 'docker container rm -f tb_mysql tb_backend tb_frontend || true'
+                        echo 'Removed any conflicting containers'
+                    } catch (Exception e) {
+                        echo "Container cleanup completed: ${e.getMessage()}"
+                    }
+                    
                     sh 'docker-compose up -d --force-recreate'
                     echo 'Started containers with new images'
                     
