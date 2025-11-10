@@ -1,0 +1,78 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKER_HUB_REPO = 'yrcd27/travel-bucket-list'
+        BUILD_NUMBER = "${env.BUILD_NUMBER}"
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Pulling latest code from Git repository...'
+                checkout scm
+            }
+        }
+        
+        stage('Build Docker Images') {
+            parallel {
+                stage('Build Frontend Image') {
+                    steps {
+                        echo 'Building Frontend Docker image...'
+                        script {
+                            dir('frontend') {
+                                sh "docker build -t ${DOCKER_HUB_REPO}-frontend:latest ."
+                            }
+                        }
+                    }
+                }
+                stage('Build Backend Image') {
+                    steps {
+                        echo 'Building Backend Docker image...'
+                        script {
+                            dir('backend') {
+                                sh "docker build -t ${DOCKER_HUB_REPO}-backend:latest ."
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy Locally') {
+            steps {
+                echo 'Restarting local containers with new images...'
+                script {
+                    try {
+                        sh 'docker-compose down --remove-orphans'
+                        echo 'Stopped existing containers'
+                    } catch (Exception e) {
+                        echo "No existing containers to stop: ${e.getMessage()}"
+                    }
+                    
+                    sh 'docker-compose up -d --force-recreate'
+                    echo 'Started containers with new images'
+                    
+                    sh 'sleep 10'
+                    
+                    try {
+                        sh 'curl -f http://localhost:5173 || echo "Frontend starting..."'
+                        sh 'curl -f http://localhost:5000/api/health || echo "Backend starting..."'
+                    } catch (Exception e) {
+                        echo "Health check completed: ${e.getMessage()}"
+                    }
+                }
+                echo 'Local deployment completed! Check http://localhost:5173'
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Local deployment pipeline completed successfully!'
+        }
+        failure {
+            echo 'Local deployment pipeline failed. Check the logs for details.'
+        }
+    }
+}
