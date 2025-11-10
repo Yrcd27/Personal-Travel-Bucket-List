@@ -49,6 +49,55 @@ pipeline {
                     echo "Frontend image: ${DOCKER_HUB_REPO}-frontend:${BUILD_NUMBER}"
                     echo "Backend image: ${DOCKER_HUB_REPO}-backend:${BUILD_NUMBER}"
                     
+                    // Add dashboard notification
+                    currentBuild.description = "🚀 APPROVAL NEEDED: Docker images ready for push!"
+                    currentBuild.displayName = "#${BUILD_NUMBER} - Waiting for Approval"
+                    
+                    // Create browser notification script
+                    writeFile file: 'notification.html', text: '''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jenkins Approval Required</title>
+    <script>
+        function showNotification() {
+            if ("Notification" in window) {
+                if (Notification.permission === "granted") {
+                    new Notification("🚀 Jenkins: Approval Required!", {
+                        body: "Docker images built successfully. Click to approve push to Docker Hub.",
+                        icon: "/static/images/jenkins.png",
+                        requireInteraction: true
+                    }).onclick = function() {
+                        window.open("''' + env.BUILD_URL + '''input", "_blank");
+                    };
+                } else if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(function (permission) {
+                        if (permission === "granted") {
+                            showNotification();
+                        }
+                    });
+                }
+            }
+            // Auto-redirect after 3 seconds
+            setTimeout(function() {
+                window.location.href = "''' + env.BUILD_URL + '''input";
+            }, 3000);
+        }
+        window.onload = showNotification;
+    </script>
+</head>
+<body>
+    <h1>🚀 Jenkins Approval Required!</h1>
+    <p>Docker images built successfully!</p>
+    <p>You will be redirected to the approval page in 3 seconds...</p>
+    <a href="''' + env.BUILD_URL + '''input">Click here to approve now</a>
+</body>
+</html>
+'''
+                    
+                    // Archive the notification file
+                    archiveArtifacts artifacts: 'notification.html', allowEmptyArchive: false
+                    
                     def userInput = input(
                         id: 'dockerPushApproval',
                         message: '🚀 Docker Images Built Successfully! Push to Docker Hub?',
