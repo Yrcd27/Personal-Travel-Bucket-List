@@ -51,12 +51,15 @@ pipeline {
                     
                     def userInput = input(
                         id: 'dockerPushApproval',
-                        message: 'Push Docker images to Docker Hub?',
+                        message: '🚀 Docker Images Built Successfully! Push to Docker Hub?',
+                        submitter: 'admin',
+                        submitterParameter: 'APPROVER',
+                        ok: 'Proceed with Decision',
                         parameters: [
                             choice(
                                 name: 'PUSH_DECISION',
                                 choices: ['No', 'Yes'],
-                                description: 'Do you want to push the built images to Docker Hub?'
+                                description: '✅ Yes: Push images to Docker Hub\n❌ No: Skip Docker Hub push'
                             )
                         ]
                     )
