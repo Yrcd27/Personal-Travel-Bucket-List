@@ -105,16 +105,17 @@ pipeline {
                         submitterParameter: 'APPROVER',
                         ok: 'Proceed with Decision',
                         parameters: [
-                            choice(
-                                name: 'PUSH_DECISION',
-                                choices: ['Yes', 'No'],
-                                description: 'Yes: Push images to Docker Hub\nNo: Skip Docker Hub push'
+                            booleanParam(
+                                name: 'PUSH_TO_DOCKERHUB',
+                                defaultValue: false,
+                                description: 'Check this box to push images to Docker Hub'
                             )
                         ]
                     )
                     
-                    if (userInput == 'Yes') {
+                    if (userInput.PUSH_TO_DOCKERHUB) {
                         env.PUSH_TO_DOCKERHUB = 'true'
+                        echo 'User chose to push images to Docker Hub'
                     } else {
                         env.PUSH_TO_DOCKERHUB = 'false'
                         echo 'User chose not to push images to Docker Hub'
