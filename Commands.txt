@@ -43,18 +43,18 @@ DATABASE COMMANDS
 ================================================================================
 
 Connect to MySQL database (as root) :- docker exec -it tb_mysql mysql -u root -p
-                                     Password: root_password_here
-Connect with app user :- docker exec -it tb_mysql mysql -u app_user -p travel_bucket
-                        Password: app_password
+                                     Password: rootpassword123
+Connect with app user :- docker exec -it tb_mysql mysql -u travel_user -p travel_bucket
+                        Password: userpassword123
 
 MySQL Commands (run after connecting):
 SHOW DATABASES;                    # List all databases
 USE travel_bucket;                # Select your database
 SHOW TABLES;                      # List all tables
 DESCRIBE users;                   # View table structure
-DESCRIBE destinations;            # View table structure
+DESCRIBE destinations;            # View table structure (table doesn't exist yet)
 SELECT * FROM users;              # View all users
-SELECT * FROM destinations;       # View all destinations
+SELECT * FROM destinations;       # View all destinations (table doesn't exist yet)
 EXIT;                             # Exit MySQL shell
 
 ================================================================================
@@ -80,6 +80,23 @@ Enter container shell :- docker exec -it tb_api /bin/sh
                          docker exec -it tb_web /bin/sh
 Check environment variables :- docker exec tb_api env
 Check container processes :- docker exec tb_api ps aux
+
+================================================================================
+DEBUGGING API ISSUES
+================================================================================
+
+Check backend logs :- docker-compose logs -f backend
+Check database logs :- docker-compose logs -f db
+Check all container status :- docker ps
+Test database connection :- docker exec tb_api node -e "const pool=require('./src/db'); pool.query('SELECT 1').then(()=>console.log('DB OK')).catch(e=>console.log('DB ERROR:',e.message))"
+Test API health endpoint :- curl http://localhost:5000/api/health
+Check backend environment :- docker exec tb_api env | grep -E "(DB_|JWT_|PORT)"
+
+Common Fixes for 500 Errors:
+1. Database not ready = wait 30 seconds, or docker-compose restart db
+2. Wrong database credentials = check .env file
+3. Backend can't connect to db = docker-compose restart backend
+4. Database not initialized = docker-compose down -v && docker-compose up
 
 ================================================================================
 CLEANUP COMMANDS
