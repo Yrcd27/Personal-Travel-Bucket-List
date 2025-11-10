@@ -1,0 +1,104 @@
+================================================================================
+COMMON DOCKER COMMANDS
+================================================================================
+
+List all containers (running) :- docker ps
+List all containers (including stopped) :- docker ps -a
+List all images :- docker images
+List all volumes :- docker volume ls
+List all networks :- docker network ls
+
+Pull an image from Docker Hub :- docker pull <image_name>
+Run a container from image :- docker run -d --name <container_name> <image>
+Stop a running container :- docker stop <container_name>
+Start a stopped container :- docker start <container_name>
+Remove a container :- docker rm <container_name>
+Remove an image :- docker rmi <image_name>
+
+Execute command in running container :- docker exec -it <container_name> <command>
+View container logs :- docker logs <container_name>
+Follow container logs :- docker logs -f <container_name>
+Copy files to container :- docker cp <local_path> <container>:<container_path>
+Copy files from container :- docker cp <container>:<container_path> <local_path>
+
+================================================================================
+PROJECT-SPECIFIC COMMANDS
+================================================================================
+
+Start the entire project : docker-compose up
+Start in background (detached) : docker-compose up -d
+Stop all services : docker-compose down
+Stop and delete ALL data : docker-compose down -v
+
+Restart specific service :- docker-compose restart backend
+
+Restart all services :- docker-compose restart
+
+Build and start (after code changes) :- docker-compose up --build
+Build specific service :- docker-compose up --build backend
+                          docker-compose up --build frontend
+
+================================================================================
+DATABASE COMMANDS
+================================================================================
+
+Connect to MySQL database (as root) :- docker exec -it tb_mysql mysql -u root -p
+                                     Password: root_password_here
+Connect with app user :- docker exec -it tb_mysql mysql -u app_user -p travel_bucket
+                        Password: app_password
+
+MySQL Commands (run after connecting):
+SHOW DATABASES;                    # List all databases
+USE travel_bucket;                # Select your database
+SHOW TABLES;                      # List all tables
+DESCRIBE users;                   # View table structure
+DESCRIBE destinations;            # View table structure
+SELECT * FROM users;              # View all users
+SELECT * FROM destinations;       # View all destinations
+EXIT;                             # Exit MySQL shell
+
+================================================================================
+LOGS & MONITORING
+================================================================================
+
+View all logs :- docker-compose logs
+View specific service logs :- docker-compose logs backend
+                              docker-compose logs frontend
+                              docker-compose logs db
+Follow logs in real-time :- docker-compose logs -f backend
+View running containers :- docker ps
+Check container health :- docker stats
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Inspect container details :- docker inspect tb_mysql
+                            docker inspect tb_api
+                            docker inspect tb_web
+Enter container shell :- docker exec -it tb_api /bin/sh
+                         docker exec -it tb_web /bin/sh
+Check environment variables :- docker exec tb_api env
+Check container processes :- docker exec tb_api ps aux
+
+================================================================================
+CLEANUP COMMANDS
+================================================================================
+
+Remove unused containers :- docker container prune
+Remove unused images :- docker image prune
+Remove unused volumes :- docker volume prune
+Clean everything :- docker system prune -a
+Remove specific container :- docker rm tb_mysql
+Remove specific image :- docker rmi <image_id>
+
+================================================================================
+QUICK REFERENCE
+================================================================================
+
+Frontend changes = Auto-reload, no command needed!
+Backend changes = docker-compose restart backend
+Database issues = docker-compose logs db
+Port conflicts = docker ps
+Need to rebuild = docker-compose up --build
+
