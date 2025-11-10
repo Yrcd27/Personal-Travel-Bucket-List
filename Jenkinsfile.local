@@ -51,8 +51,9 @@ pipeline {
                     }
                     
                     try {
-                        sh 'docker container rm -f tb_mysql tb_backend tb_frontend || true'
-                        echo 'Removed any conflicting containers'
+                        sh 'docker stop $(docker ps -aq) 2>/dev/null || true'
+                        sh 'docker rm $(docker ps -aq) 2>/dev/null || true'
+                        echo 'Removed all existing containers'
                     } catch (Exception e) {
                         echo "Container cleanup completed: ${e.getMessage()}"
                     }
