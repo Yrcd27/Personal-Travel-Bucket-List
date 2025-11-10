@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         DOCKER_HUB_REPO = 'yrcd27/travel-bucket-list'
-        DOCKER_HUB_CREDENTIALS = credntials('dockerhub-credentials')
+        DOCKER_HUB_CREDENTIALS = credentials('dockerhub-credentials')
         BUILD_NUMBER = "${env.BUILD_NUMBER}"
     }
     
