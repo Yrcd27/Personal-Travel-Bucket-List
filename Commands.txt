@@ -96,7 +96,7 @@ Remove specific image :- docker rmi <image_id>
 QUICK REFERENCE
 ================================================================================
 
-Frontend changes = Auto-reload, no command needed!
+Frontend changes = Auto-reload, no command needed!!!!
 Backend changes = docker-compose restart backend
 Database issues = docker-compose logs db
 Port conflicts = docker ps
