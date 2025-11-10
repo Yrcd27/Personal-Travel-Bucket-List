@@ -123,35 +123,7 @@ pipeline {
             }
         }
         
-        stage('Deploy Locally') {
-            steps {
-                echo 'Deploying new images to local containers...'
-                script {
-                    try {
-                        sh 'docker-compose down'
-                        echo 'Stopped existing containers'
-                    } catch (Exception e) {
-                        echo "No existing containers to stop: ${e.getMessage()}"
-                    }
-                    
-                    sh 'docker-compose up -d'
-                    echo 'Started containers with new images'
-                    
-                    // Wait for containers to be ready
-                    sh 'sleep 10'
-                    
-                    // Health check
-                    try {
-                        sh 'curl -f http://localhost:5173 || echo "Frontend not ready yet"'
-                        sh 'curl -f http://localhost:5000/api/health || echo "Backend not ready yet"'
-                    } catch (Exception e) {
-                        echo "Health check completed: ${e.getMessage()}"
-                    }
-                }
-                echo 'Local deployment completed! Check http://localhost:5173'
-            }
-        }
-        
+
         stage('Push to Docker Hub') {
             when {
                 environment name: 'PUSH_TO_DOCKERHUB', value: 'true'
