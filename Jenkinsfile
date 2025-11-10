@@ -107,8 +107,8 @@ pipeline {
                         parameters: [
                             choice(
                                 name: 'PUSH_DECISION',
-                                choices: ['No', 'Yes'],
-                                description: 'Yes: Push images to Docker Hub\n No: Skip Docker Hub push'
+                                choices: ['Yes', 'No'],
+                                description: 'Yes: Push images to Docker Hub\nNo: Skip Docker Hub push'
                             )
                         ]
                     )
