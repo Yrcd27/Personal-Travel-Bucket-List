@@ -61,7 +61,8 @@ pipeline {
                     sh 'docker-compose up -d --force-recreate'
                     echo 'Started containers with new images'
                     
-                    sh 'sleep 10'
+                    sh 'sleep 30'
+                    echo 'Waiting for services to be ready...'
                     
                     try {
                         sh 'curl -f http://localhost:5173 || echo "Frontend starting..."'
@@ -71,6 +72,8 @@ pipeline {
                     }
                 }
                 echo 'Local deployment completed! Check http://localhost:5173'
+                echo 'Frontend: http://localhost:5173'
+                echo 'Backend API: http://localhost:5000'
             }
         }
     }
