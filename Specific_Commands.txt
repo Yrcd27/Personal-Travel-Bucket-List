@@ -1,0 +1,24 @@
+# Jenkins Commands
+
+## Starting and Stopping Jenkins
+- Start Jenkins: `sudo systemctl start jenkins`
+- Stop Jenkins: `sudo systemctl stop jenkins`
+- Restart Jenkins: `sudo systemctl restart jenkins`
+- Check Jenkins status: `sudo systemctl status jenkins`
+
+## Jenkins Logs
+- View Jenkins logs: `sudo journalctl -u jenkins`
+- Tail Jenkins logs: `sudo journalctl -u jenkins -f`
+
+## Jenkins Configuration
+- Reload Jenkins configuration: `sudo systemctl reload jenkins`
+- Open Jenkins CLI: `java -jar jenkins-cli.jar -s http://<jenkins-url> <command>`
+
+## Jenkins Plugins
+- List installed plugins: `java -jar jenkins-cli.jar -s http://<jenkins-url> list-plugins`
+- Install a plugin: `java -jar jenkins-cli.jar -s http://<jenkins-url> install-plugin <plugin-name>`
+- Uninstall a plugin: `java -jar jenkins-cli.jar -s http://<jenkins-url> uninstall-plugin <plugin-name>`
+
+## Jenkins Backup and Restore
+- Backup Jenkins configuration: `cp -r /var/lib/jenkins /path/to/backup`
+- Restore Jenkins configuration: `cp -r /path/to/backup /var/lib/jenkins`
