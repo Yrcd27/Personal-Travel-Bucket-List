@@ -63,24 +63,19 @@ router.post("/login", async (req, res) => {
 });
 
 // GET /api/auth/me  (requires Authorization: Bearer <token>)
-router.get("/me", async (req, res) => {
-  try {
-    const auth = req.headers.authorization || "";
-    const parts = auth.split(" ");
-    if (parts.length !== 2 || parts[0] !== "Bearer") {
-      return res.status(401).json({ message: "Missing token" });
-    }
+const { authenticateToken } = require("../middleware/auth");
 
-    const payload = jwt.verify(parts[1], process.env.JWT_SECRET || "changeme");
+router.get("/me", authenticateToken, async (req, res) => {
+  try {
     const [rows] = await pool.query(
       "SELECT id, name, email, created_at FROM users WHERE id = ?",
-      [payload.sub]
+      [req.user.sub]
     );
     if (rows.length === 0) return res.status(404).json({ message: "User not found" });
 
     return res.json({ user: rows[0] });
   } catch (err) {
-    return res.status(401).json({ message: "Invalid token" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 

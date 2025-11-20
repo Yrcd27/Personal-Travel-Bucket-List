@@ -39,44 +39,42 @@ export default function Dashboard() {
     }
   }
 
-  function loadDestinations() {
-    // Simulate loading from localStorage (since backend doesn't have destinations API yet)
-    const saved = localStorage.getItem("destinations");
-    if (saved) {
-      setDestinations(JSON.parse(saved));
+  async function loadDestinations() {
+    try {
+      const { data } = await api.get("/api/destinations");
+      setDestinations(data.destinations);
+    } catch (err) {
+      console.error("Failed to load destinations:", err);
+      setError("Failed to load destinations");
     }
   }
 
-  function saveDestinations(list) {
-    localStorage.setItem("destinations", JSON.stringify(list));
-    setDestinations(list);
-  }
-
-  function handleAddDestination() {
+  async function handleAddDestination() {
     if (!formData.destination.trim() || !formData.country.trim()) {
       alert("Please fill in destination and country");
       return;
     }
 
-    if (editingId !== null) {
-      // Update existing
-      const updated = destinations.map((d) =>
-        d.id === editingId ? { ...formData, id: editingId } : d
-      );
-      saveDestinations(updated);
-      setEditingId(null);
-    } else {
-      // Add new
-      const newDest = {
-        ...formData,
-        id: Date.now(),
-        createdAt: new Date().toISOString()
-      };
-      saveDestinations([...destinations, newDest]);
-    }
+    try {
+      if (editingId !== null) {
+        // Update existing
+        const { data } = await api.put(`/api/destinations/${editingId}`, formData);
+        setDestinations(destinations.map((d) =>
+          d.id === editingId ? data.destination : d
+        ));
+        setEditingId(null);
+      } else {
+        // Add new
+        const { data } = await api.post("/api/destinations", formData);
+        setDestinations([data.destination, ...destinations]);
+      }
 
-    setShowAddModal(false);
-    resetForm();
+      setShowAddModal(false);
+      resetForm();
+    } catch (err) {
+      console.error("Failed to save destination:", err);
+      alert("Failed to save destination. Please try again.");
+    }
   }
 
   function handleEdit(dest) {
@@ -91,21 +89,32 @@ export default function Dashboard() {
     setShowAddModal(true);
   }
 
-  function handleDelete(id) {
-    saveDestinations(destinations.filter((d) => d.id !== id));
-    setDeleteModal({ show: false, id: null, destination: '' });
+  async function handleDelete(id) {
+    try {
+      await api.delete(`/api/destinations/${id}`);
+      setDestinations(destinations.filter((d) => d.id !== id));
+      setDeleteModal({ show: false, id: null, destination: '' });
+    } catch (err) {
+      console.error("Failed to delete destination:", err);
+      alert("Failed to delete destination. Please try again.");
+    }
   }
 
   function showDeleteConfirmation(dest) {
     setDeleteModal({ show: true, id: dest.id, destination: dest.destination });
   }
 
-  function toggleVisited(id) {
-    const updated = destinations.map((d) =>
-      d.id === id ? { ...d, visited: !d.visited } : d
-    );
-    saveDestinations(updated);
-    setVisitedModal({ show: false, id: null, destination: '', visited: false });
+  async function toggleVisited(id) {
+    try {
+      const { data } = await api.patch(`/api/destinations/${id}/visited`);
+      setDestinations(destinations.map((d) =>
+        d.id === id ? data.destination : d
+      ));
+      setVisitedModal({ show: false, id: null, destination: '', visited: false });
+    } catch (err) {
+      console.error("Failed to update destination:", err);
+      alert("Failed to update destination. Please try again.");
+    }
   }
 
   function showVisitedConfirmation(dest) {
