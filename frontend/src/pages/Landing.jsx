@@ -1,24 +1,103 @@
 import { Link } from "react-router-dom";
-import { Plane, MapPin, CheckCircle, Lock, TrendingUp, Users, Globe2, Clock, Facebook, Twitter, Instagram, Github, ArrowRight } from "lucide-react";
+import { Plane, MapPin, CheckCircle, Lock, TrendingUp, Users, Globe2, Clock, Facebook, Twitter, Instagram, Github, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function Landing() {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [startX, setStartX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  
+  const heroImages = [
+    '/assets/hero-bg.png',
+    '/assets/hero-bg2.jpg',
+    '/assets/hero-bg3.jpg',
+    '/assets/hero-bg4.jpg',
+    '/assets/hero-bg5.jpg',
+    '/assets/hero-bg6.jpg',
+    '/assets/hero-bg7.jpg',
+    '/assets/hero-bg8.jpg',
+    '/assets/hero-bg9.jpg',
+    '/assets/hero-bg10.jpg'
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => 
+        (prevIndex + 1) % heroImages.length
+      );
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
+
+  const handleTouchStart = (e) => {
+    setStartX(e.touches[0].clientX);
+    setIsDragging(true);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!isDragging) return;
+    const endX = e.changedTouches[0].clientX;
+    const diff = startX - endX;
+    
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+      } else {
+        setCurrentImageIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+      }
+    }
+    setIsDragging(false);
+  };
+
+  const handleMouseDown = (e) => {
+    setStartX(e.clientX);
+    setIsDragging(true);
+  };
+
+  const handleMouseUp = (e) => {
+    if (!isDragging) return;
+    const endX = e.clientX;
+    const diff = startX - endX;
+    
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+      } else {
+        setCurrentImageIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+      }
+    }
+    setIsDragging(false);
+  };
+
   return (
     <main className="bg-gray-50">
       {/* Hero Section with Background Image */}
-      <section className="relative min-h-[600px] flex items-center justify-center bg-gradient-to-br from-blue-900/90 via-blue-800/80 to-amber-900/70 overflow-hidden">
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-50"
-          style={{ 
-            backgroundImage: "url('/assets/hero-bg.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat"
-          }}
-        ></div>
+      <section 
+        className="relative min-h-[600px] flex items-center justify-center overflow-hidden cursor-grab active:cursor-grabbing select-none"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+      >
+        {/* Background Image Carousel */}
+        {heroImages.map((image, index) => (
+          <div 
+            key={index}
+            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${
+              index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{ 
+              backgroundImage: `url('${image}')`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat"
+            }}
+          ></div>
+        ))}
         
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-950/60 via-blue-900/50 to-amber-900/60"></div>
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-black/40"></div>
         
         {/* Hero Content */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 py-20 text-center">
