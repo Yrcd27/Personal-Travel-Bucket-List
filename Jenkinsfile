@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_HUB_REPO = 'yrcd27/travel-bucket-list'
         DOCKER_HUB_CREDENTIALS = credentials('dockerhub-credentials')
-        BUILD_NUMBER = "${env.BUILD_NUMBER}"
+        IMAGE_TAG = 'latest'
     }
     
     stages {
@@ -22,8 +22,7 @@ pipeline {
                         echo 'Building Frontend Docker image...'
                         script {
                             dir('frontend') {
-                                sh "docker build -t ${DOCKER_HUB_REPO}-frontend:${BUILD_NUMBER} ."
-                                sh "docker tag ${DOCKER_HUB_REPO}-frontend:${BUILD_NUMBER} ${DOCKER_HUB_REPO}-frontend:latest"
+                                sh "docker build -t ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG} ."
                             }
                         }
                     }
@@ -33,8 +32,7 @@ pipeline {
                         echo 'Building Backend Docker image...'
                         script {
                             dir('backend') {
-                                sh "docker build -t ${DOCKER_HUB_REPO}-backend:${BUILD_NUMBER} ."
-                                sh "docker tag ${DOCKER_HUB_REPO}-backend:${BUILD_NUMBER} ${DOCKER_HUB_REPO}-backend:latest"
+                                sh "docker build -t ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG} ."
                             }
                         }
                     }
@@ -42,57 +40,21 @@ pipeline {
             }
         }
         
-        stage('Manual Approval') {
+        stage('Push to Docker Hub') {
             steps {
+                echo 'Automatically pushing images to Docker Hub...'
                 script {
                     echo 'Docker images built successfully!'
-                    echo "Frontend image: ${DOCKER_HUB_REPO}-frontend:${BUILD_NUMBER}"
-                    echo "Backend image: ${DOCKER_HUB_REPO}-backend:${BUILD_NUMBER}"
+                    echo "Frontend image: ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG}"
+                    echo "Backend image: ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG}"
                     
+                    currentBuild.description = "Pushing Docker images to Docker Hub"
+                    currentBuild.displayName = "#${BUILD_NUMBER} - Auto Deploy"
                     
-                    currentBuild.description = "APPROVAL NEEDED: Docker images ready for push!"
-                    currentBuild.displayName = "#${BUILD_NUMBER} - Waiting for Approval"
-                    
-                    def userInput = input(
-                        id: 'dockerPushApproval',
-                        message: 'Docker Images Built Successfully! Push to Docker Hub?',
-                        submitter: 'admin',
-                        submitterParameter: 'APPROVER',
-                        ok: 'Proceed with Decision',
-                        parameters: [
-                            booleanParam(
-                                name: 'PUSH_TO_DOCKERHUB',
-                                defaultValue: false,
-                                description: 'Check this box to push images to Docker Hub'
-                            )
-                        ]
-                    )
-                    
-                    if (userInput.PUSH_TO_DOCKERHUB) {
-                        env.PUSH_TO_DOCKERHUB = 'true'
-                        echo 'User chose to push images to Docker Hub'
-                    } else {
-                        env.PUSH_TO_DOCKERHUB = 'false'
-                        echo 'User chose not to push images to Docker Hub'
-                    }
-                }
-            }
-        }
-        
-
-        stage('Push to Docker Hub') {
-            when {
-                environment name: 'PUSH_TO_DOCKERHUB', value: 'true'
-            }
-            steps {
-                echo 'Pushing images to Docker Hub...'
-                script {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                        sh "docker push ${DOCKER_HUB_REPO}-frontend:${BUILD_NUMBER}"
-                        sh "docker push ${DOCKER_HUB_REPO}-frontend:latest"
-                        sh "docker push ${DOCKER_HUB_REPO}-backend:${BUILD_NUMBER}"
-                        sh "docker push ${DOCKER_HUB_REPO}-backend:latest"
+                        sh "docker push ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG}"
+                        sh "docker push ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG}"
                         sh 'docker logout'
                     }
                 }
@@ -105,10 +67,8 @@ pipeline {
         always {
             echo 'Cleaning up local Docker images...'
             sh """
-                docker rmi ${DOCKER_HUB_REPO}-frontend:${BUILD_NUMBER} || true
-                docker rmi ${DOCKER_HUB_REPO}-frontend:latest || true
-                docker rmi ${DOCKER_HUB_REPO}-backend:${BUILD_NUMBER} || true
-                docker rmi ${DOCKER_HUB_REPO}-backend:latest || true
+                docker rmi ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG} || true
+                docker rmi ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG} || true
             """
         }
         success {
