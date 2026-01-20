@@ -1,0 +1,19 @@
+# Terraform Variables File - Example
+# Copy this file to terraform.tfvars and fill in your actual values
+# DO NOT commit terraform.tfvars to Git (it may contain sensitive data)
+
+# AWS Configuration
+aws_region = "us-east-1"  # Change to your preferred region
+
+# Project Configuration
+environment  = "dev"
+project_name = "travel-bucket"
+
+# EC2 Configuration
+instance_type = "t2.micro"  # Free tier: t2.micro, Better: t2.small or t2.medium
+key_name      = "YOUR_AWS_KEY_NAME_HERE"  # REQUIRED: Name of your AWS key pair (without .pem)
+
+# Security - SSH Access
+# Get your IP: curl ifconfig.me
+# Format: "x.x.x.x/32" for single IP, or "0.0.0.0/0" for all (not recommended)
+allowed_ssh_ips = ["0.0.0.0/0"]  # Change to your IP for better security

@@ -4,6 +4,14 @@
 .env.development
 .env.production
 
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/*.tfstate.backup
+terraform/terraform.tfvars
+
 # Node
 node_modules/
 npm-debug.log
