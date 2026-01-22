@@ -1,19 +1,24 @@
 # Main Terraform Configuration
 # This is the heart of your infrastructure - it creates everything!
 
-# Data source: Get the latest Ubuntu 22.04 AMI
+# Data source: Get the latest Ubuntu 22.04 AMI for ARM64 (Graviton)
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"] # Canonical (Ubuntu official)
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-arm64-server-*"]
   }
 
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
+  }
+  
+  filter {
+    name   = "architecture"
+    values = ["arm64"]
   }
 }
 
@@ -168,18 +173,51 @@ resource "aws_instance" "app_server" {
   # User data script - runs on first boot
   user_data = <<-EOF
               #!/bin/bash
-              # Update system
+              set -e
+              
+              # Log all output
+              exec > >(tee /var/log/user-data.log)
+              exec 2>&1
+              
+              echo "=== Starting EC2 Initialization ==="
+              
+              # 1. Create 2GB swap space (critical for t4g.small with 2GB RAM)
+              echo "Creating swap space..."
+              dd if=/dev/zero of=/swapfile bs=128M count=16
+              chmod 600 /swapfile
+              mkswap /swapfile
+              swapon /swapfile
+              echo '/swapfile none swap sw 0 0' >> /etc/fstab
+              
+              # 2. Optimize swap usage (don't swap until 90% RAM used)
+              echo "vm.swappiness=10" >> /etc/sysctl.conf
+              echo "vm.vfs_cache_pressure=50" >> /etc/sysctl.conf
+              sysctl -p
+              
+              # 3. CPU governor optimization for ARM (Graviton)
+              echo "performance" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+              
+              # 4. Disable unnecessary services to save memory
+              systemctl disable snapd.service snapd.socket || true
+              systemctl stop snapd.service snapd.socket || true
+              
+              # 5. Update system (non-interactive)
+              export DEBIAN_FRONTEND=noninteractive
               apt-get update -y
-              apt-get upgrade -y
+              apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
               
-              # Install basic tools
-              apt-get install -y curl wget git vim
+              # 6. Install essential tools only
+              apt-get install -y curl wget git vim htop
               
-              # Create app directory
+              # 7. Create app directory
               mkdir -p /opt/app
               chmod 755 /opt/app
               
-              echo "EC2 instance initialized successfully" > /opt/app/init.log
+              # 8. Log completion
+              echo "=== EC2 Initialization Completed ===" 
+              free -h > /opt/app/memory-status.txt
+              echo "Swap configured and system optimized" > /opt/app/init.log
+              date >> /opt/app/init.log
               EOF
 
   tags = {

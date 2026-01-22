@@ -1,0 +1,134 @@
+---
+# Application Deployment Role
+# Deploys Travel Bucket List application using Docker Compose
+
+- name: Create application directory
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0755'
+
+- name: Create subdirectories
+  file:
+    path: "{{ app_dir }}/{{ item }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0755'
+  loop:
+    - backend
+    - frontend
+    - db
+
+- name: Copy backend files
+  ansible.posix.synchronize:
+    src: "{{ playbook_dir }}/../backend/"
+    dest: "{{ app_dir }}/backend/"
+    delete: true
+    private_key: ~/.ssh/travel-bucket-key.pem
+    rsync_opts:
+      - "--exclude=node_modules"
+      - "--exclude=.git"
+      - "--exclude=.env"
+  delegate_to: localhost
+
+- name: Copy frontend files
+  ansible.posix.synchronize:
+    src: "{{ playbook_dir }}/../frontend/"
+    dest: "{{ app_dir }}/frontend/"
+    delete: true
+    private_key: ~/.ssh/travel-bucket-key.pem
+    rsync_opts:
+      - "--exclude=node_modules"
+      - "--exclude=.git"
+      - "--exclude=dist"
+      - "--exclude=.env"
+  delegate_to: localhost
+
+- name: Copy database initialization files
+  ansible.posix.synchronize:
+    src: "{{ playbook_dir }}/../db/"
+    dest: "{{ app_dir }}/db/"
+    delete: true
+    private_key: ~/.ssh/travel-bucket-key.pem
+  delegate_to: localhost
+
+- name: Generate .env file from template
+  template:
+    src: .env.j2
+    dest: "{{ app_dir }}/.env"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0600'
+
+- name: Generate docker-compose.yml from template
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ app_dir }}/docker-compose.yml"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0644'
+
+- name: Stop existing containers (if any)
+  shell: docker compose down
+  args:
+    chdir: "{{ app_dir }}"
+  become: true
+  become_user: "{{ app_user }}"
+  ignore_errors: true
+
+- name: Remove existing Docker volumes (fresh start)
+  command: docker volume rm travel-bucket-list_mysql_data
+  ignore_errors: true
+
+- name: Pull latest Docker images
+  shell: docker compose pull
+  args:
+    chdir: "{{ app_dir }}"
+  become: true
+  become_user: "{{ app_user }}"
+  ignore_errors: true
+
+- name: Start application with Docker Compose
+  shell: docker compose up -d --build --remove-orphans
+  args:
+    chdir: "{{ app_dir }}"
+  become: true
+  become_user: "{{ app_user }}"
+  register: compose_output
+
+# MySQL readiness check skipped - using external RDS MySQL
+# - name: Wait for MySQL to be ready
+#   wait_for:
+#     host: localhost
+#     port: "{{ mysql_port }}"
+#     delay: 10
+#     timeout: 120
+#     state: started
+
+- name: Wait for backend to be ready
+  wait_for:
+    host: localhost
+    port: "{{ backend_port }}"
+    delay: 5
+    timeout: 60
+    state: started
+
+- name: Wait for frontend to be ready
+  wait_for:
+    host: localhost
+    port: "{{ frontend_port }}"
+    delay: 5
+    timeout: 60
+    state: started
+
+- name: Display running containers
+  command: docker ps
+  register: docker_ps
+  changed_when: false
+
+- name: Show running containers
+  debug:
+    msg: "{{ docker_ps.stdout_lines }}"

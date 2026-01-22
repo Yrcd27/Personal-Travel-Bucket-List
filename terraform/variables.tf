@@ -22,7 +22,7 @@ variable "project_name" {
 variable "instance_type" {
   description = "EC2 instance type"
   type        = string
-  default     = "t2.micro" # Free tier eligible
+  default     = "t4g.small" # ARM-based, 2GB RAM
 }
 
 variable "key_name" {
@@ -41,4 +41,12 @@ variable "allowed_ssh_ips" {
   description = "List of IP addresses allowed to SSH (CIDR notation)"
   type        = list(string)
   default     = ["0.0.0.0/0"] # Open to world - change for security
+}
+
+# Database password for RDS
+variable "db_password" {
+  description = "Password for RDS MySQL database"
+  type        = string
+  default     = "TravelBucket2024SecurePass"
+  sensitive   = true
 }

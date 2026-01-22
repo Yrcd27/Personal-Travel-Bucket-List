@@ -1,0 +1,71 @@
+---
+# Main Ansible Playbook for Travel Bucket List Application
+# This orchestrates the complete deployment process
+
+- name: Deploy Travel Bucket List Application
+  hosts: app_servers
+  become: yes  # Run commands with sudo
+  gather_facts: yes
+
+  vars:
+    # Application settings
+    app_name: travel-bucket-list
+    app_user: ubuntu
+    app_dir: /home/ubuntu/travel-bucket-list
+
+    # Docker settings
+    docker_compose_version: "2.24.5"
+
+    # RDS Database settings (from Terraform outputs)
+    rds_address: "travel-bucket-db.ck3k822u2a5v.us-east-1.rds.amazonaws.com"
+    db_password: "TravelBucket2024SecurePass"
+
+    # JWT settings
+    jwt_secret: "your-super-secret-jwt-key-change-in-production"
+
+    # Application ports
+    frontend_port: 5173
+    backend_port: 5000
+
+  pre_tasks:
+    - name: Display deployment information
+      debug:
+        msg:
+          - "Deploying {{ app_name }} to {{ inventory_hostname }}"
+          - "Server IP: {{ ansible_host }}"
+          - "Application will be available at: http://{{ ansible_host }}:{{ frontend_port }}"
+          - "API will be available at: http://{{ ansible_host }}:{{ backend_port }}"
+          - "Database: AWS RDS MySQL at {{ rds_address }}"
+
+    - name: Wait for server to be ready
+      wait_for_connection:
+        timeout: 300
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+  roles:
+    - role: docker
+      tags: ['docker', 'setup']
+
+    - role: app-deploy
+      tags: ['deploy', 'app']
+
+    - role: health-check
+      tags: ['health', 'verify']
+
+  post_tasks:
+    - name: Display success message
+      debug:
+        msg:
+          - "✅ Deployment completed successfully!"
+          - "🌐 Frontend: http://{{ ansible_host }}:{{ frontend_port }}"
+          - "🔌 Backend API: http://{{ ansible_host }}:{{ backend_port }}"
+          - "📊 Database: AWS RDS MySQL ({{ rds_address }})"
+          - ""
+          - "Next steps:"
+          - "1. Visit http://{{ ansible_host }}:{{ frontend_port }} in your browser"
+          - "2. Create an account and test the application"
+          - "3. Check logs: ssh ubuntu@{{ ansible_host }} 'cd {{ app_dir }} && docker compose logs'"

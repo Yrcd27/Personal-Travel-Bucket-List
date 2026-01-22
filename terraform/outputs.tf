@@ -67,3 +67,24 @@ output "ansible_inventory" {
     }
   })
 }
+
+# RDS Database Outputs
+output "rds_endpoint" {
+  description = "RDS MySQL endpoint"
+  value       = aws_db_instance.main.endpoint
+}
+
+output "rds_address" {
+  description = "RDS MySQL address (hostname only)"
+  value       = aws_db_instance.main.address
+}
+
+output "rds_port" {
+  description = "RDS MySQL port"
+  value       = aws_db_instance.main.port
+}
+
+output "database_name" {
+  description = "Database name"
+  value       = aws_db_instance.main.db_name
+}

@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: travel-backend
+    restart: always
+    environment:
+      DB_HOST: {{ rds_address }}
+      DB_USER: admin
+      DB_PASSWORD: {{ db_password }}
+      DB_NAME: travelbucket
+      JWT_SECRET: {{ jwt_secret }}
+      PORT: {{ backend_port }}
+      NODE_ENV: production
+    ports:
+      - "{{ backend_port }}:{{ backend_port }}"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:{{ backend_port }}/api/destinations"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://{{ ansible_host }}:{{ backend_port }}
+    container_name: travel-frontend
+    restart: always
+    ports:
+      - "{{ frontend_port }}:80"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  app-network:
+    driver: bridge

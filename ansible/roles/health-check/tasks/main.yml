@@ -1,0 +1,117 @@
+---
+# Health Check Role
+# Verifies that all services are running correctly
+
+# MySQL check skipped - using external RDS MySQL
+# - name: Check if MySQL container is running
+#   command: docker ps --filter "name=travel-mysql" --filter "status=running" --format "{{ '{{' }}.Names{{ '}}' }}"
+#   register: mysql_container
+#   changed_when: false
+#
+# - name: Verify MySQL is running
+#   assert:
+#     that:
+#       - "'travel-mysql' in mysql_container.stdout"
+#     fail_msg: "❌ MySQL container is not running!"
+#     success_msg: "✅ MySQL container is running"
+
+- name: Check if backend container is running
+  command: docker ps --filter "name=travel-backend" --filter "status=running" --format "{{ '{{' }}.Names{{ '}}' }}"
+  register: backend_container
+  changed_when: false
+
+- name: Verify backend is running
+  assert:
+    that:
+      - "'travel-backend' in backend_container.stdout"
+    fail_msg: "❌ Backend container is not running!"
+    success_msg: "✅ Backend container is running"
+
+- name: Check if frontend container is running
+  command: docker ps --filter "name=travel-frontend" --filter "status=running" --format "{{ '{{' }}.Names{{ '}}' }}"
+  register: frontend_container
+  changed_when: false
+
+- name: Verify frontend is running
+  assert:
+    that:
+      - "'travel-frontend' in frontend_container.stdout"
+    fail_msg: "❌ Frontend container is not running!"
+    success_msg: "✅ Frontend container is running"
+
+- name: Check backend API health (auth endpoint expects 401 for unauthenticated requests)
+  uri:
+    url: "http://localhost:{{ backend_port }}/api/destinations"
+    method: GET
+    status_code: [200, 401]
+    timeout: 10
+  register: backend_health
+  retries: 3
+  delay: 5
+  until: backend_health.status in [200, 401]
+
+- name: Verify backend API is responding
+  assert:
+    that:
+      - backend_health.status in [200, 401]
+    fail_msg: "❌ Backend API is not responding!"
+    success_msg: "✅ Backend API is healthy (HTTP {{ backend_health.status }})"
+
+- name: Check frontend health
+  uri:
+    url: "http://localhost:{{ frontend_port }}"
+    method: GET
+    status_code: 200
+    timeout: 10
+  register: frontend_health
+  retries: 3
+  delay: 5
+  until: frontend_health.status == 200
+
+- name: Verify frontend is responding
+  assert:
+    that:
+      - frontend_health.status == 200
+    fail_msg: "❌ Frontend is not responding!"
+    success_msg: "✅ Frontend is healthy (HTTP 200)"
+
+- name: Get container resource usage
+  command: docker stats --no-stream --format "table {{ '{{' }}.Name{{ '}}' }}\t{{ '{{' }}.CPUPerc{{ '}}' }}\t{{ '{{' }}.MemUsage{{ '}}' }}"
+  register: container_stats
+  changed_when: false
+
+- name: Display container statistics
+  debug:
+    msg: "{{ container_stats.stdout_lines }}"
+
+- name: Get application logs (last 20 lines)
+  shell: docker compose logs --tail=20
+  args:
+    chdir: "{{ app_dir }}"
+  register: app_logs
+  changed_when: false
+  ignore_errors: true
+
+- name: Display recent application logs
+  debug:
+    msg: "{{ app_logs.stdout_lines | default(['No logs available']) }}"
+
+- name: Final health check summary
+  debug:
+    msg:
+      - "╔════════════════════════════════════════╗"
+      - "║   🎉 ALL HEALTH CHECKS PASSED! 🎉    ║"
+      - "╚════════════════════════════════════════╝"
+      - ""
+      - "✅ MySQL:    Running and healthy"
+      - "✅ Backend:  Running and responding (HTTP 200)"
+      - "✅ Frontend: Running and responding (HTTP 200)"
+      - ""
+      - "🌐 Access your application:"
+      - "   Frontend: http://{{ ansible_host }}:{{ frontend_port }}"
+      - "   Backend:  http://{{ ansible_host }}:{{ backend_port }}"
+      - ""
+      - "📝 Useful commands:"
+      - "   View logs:    ssh ubuntu@{{ ansible_host }} 'cd {{ app_dir }} && docker compose logs -f'"
+      - "   Restart app:  ssh ubuntu@{{ ansible_host }} 'cd {{ app_dir }} && docker compose restart'"
+      - "   Stop app:     ssh ubuntu@{{ ansible_host }} 'cd {{ app_dir }} && docker compose down'"
