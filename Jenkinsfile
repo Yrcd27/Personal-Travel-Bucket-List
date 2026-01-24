@@ -19,20 +19,20 @@ pipeline {
             parallel {
                 stage('Build Frontend Image') {
                     steps {
-                        echo 'Building Frontend Docker image...'
+                        echo 'Building Frontend Docker image for ARM64...'
                         script {
                             dir('frontend') {
-                                sh "docker build -t ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG} ."
+                                sh "docker build --platform linux/arm64 -t ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG} ."
                             }
                         }
                     }
                 }
                 stage('Build Backend Image') {
                     steps {
-                        echo 'Building Backend Docker image...'
+                        echo 'Building Backend Docker image for ARM64...'
                         script {
                             dir('backend') {
-                                sh "docker build -t ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG} ."
+                                sh "docker build --platform linux/arm64 -t ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG} ."
                             }
                         }
                     }
@@ -106,6 +106,44 @@ pipeline {
                 echo 'Images successfully pushed to Docker Hub!'
             }
         }
+        
+        stage('Deploy to EC2') {
+            steps {
+                echo 'Deploying to EC2 instance...'
+                script {
+                    sshagent(['ec2-ssh-key']) {
+                        sh '''
+                            ssh -o StrictHostKeyChecking=no ubuntu@23.20.92.144 "
+                                cd /home/ubuntu/travel-bucket-list
+                                echo 'Pulling latest images from Docker Hub...'
+                                docker compose pull
+                                echo 'Restarting containers...'
+                                docker compose up -d --force-recreate
+                                echo 'Deployment complete!'
+                                docker ps
+                            "
+                        '''
+                    }
+                }
+            }
+        }
+        
+        stage('Health Check') {
+            steps {
+                echo 'Verifying deployment...'
+                script {
+                    sh '''
+                        echo "Waiting 15 seconds for services to start..."
+                        sleep 15
+                        echo "Testing frontend..."
+                        curl -f http://23.20.92.144:5173 || exit 1
+                        echo "Testing backend..."
+                        curl -f http://23.20.92.144:5000 || exit 1
+                        echo "✓ All services are healthy!"
+                    '''
+                }
+            }
+        }
     }
     
     post {
@@ -117,10 +155,11 @@ pipeline {
             """
         }
         success {
-            echo 'Pipeline completed successfully!'
+            echo '✓ Pipeline completed successfully!'
+            echo '✓ Application deployed to: http://23.20.92.144:5173'
         }
         failure {
-            echo 'Pipeline failed. Check the logs for details.'
+            echo '✗ Pipeline failed. Check the logs for details.'
         }
     }
 }
