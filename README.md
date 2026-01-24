@@ -1,6 +1,6 @@
 <div align="center">
 
-# Personal Travel Bucket List 🌍
+# Travelogue 🌍
 
 A full-stack web application for managing your travel bucket list with complete DevOps automation pipeline.
 
