@@ -76,15 +76,15 @@ This project demonstrates a **production-grade DevOps pipeline** with full autom
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   GitHub Repo   │───▶│  Jenkins CI/CD  │───▶│   Docker Hub    │
-│   (Source Code) │    │  (Build Server) │    │ (Image Registry)│
+│   (Source Code) │    │ (Hosted on EC2) │    │ (Image Registry)│
 └─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         │ Webhook Trigger       │ SSH Deploy            │ Pull Images
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  Terraform IaC  │───▶│ App Server EC2  │◀───│  Ansible Deploy │
-│ (Infrastructure)│    │ (Production)    │    │ (Configuration) │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                │                       │
+                                │ Ansible Deploy       │ Pull Images
+                                ▼                       ▼
+                       ┌─────────────────┐    ┌─────────────────┐
+                       │ App Server EC2  │◀───│  Ansible Deploy │
+                       │ (Production)    │    │ (from Jenkins)  │
+                       └─────────────────┘    └─────────────────┘
                                 │
                                 │ Database Connection
                                 ▼
@@ -92,13 +92,108 @@ This project demonstrates a **production-grade DevOps pipeline** with full autom
                        │   RDS MySQL     │
                        │   (Database)    │
                        └─────────────────┘
+
+┌─────────────────┐
+│  Terraform IaC  │ ──── Provisions All 3 Resources:
+│ (Infrastructure)│      • Jenkins Server EC2
+└─────────────────┘      • Application Server EC2
+                         • RDS MySQL Database
 ```
+
+## How the Complete Pipeline Works
+
+### 🏗 **Infrastructure Setup (Terraform)**
+
+**Terraform provisions 3 AWS resources:**
+
+1. **Jenkins Server (EC2)** - t4g.small ARM64 instance
+   - Hosts Jenkins CI/CD server
+   - Pre-installed with Docker and Ansible
+   - Receives GitHub webhooks on port 8080
+   - Builds ARM64 Docker images
+
+2. **Application Server (EC2)** - t4g.small ARM64 instance
+   - Hosts production application
+   - Runs Docker Compose with frontend/backend
+   - Serves React app on port 5173
+   - Serves Node.js API on port 5000
+
+3. **RDS MySQL Database** - db.t3.micro managed database
+   - Persistent data storage
+   - Automated backups and maintenance
+   - Secure network isolation
+
+**Infrastructure Command:**
+```bash
+terraform apply  # Creates all 3 resources with networking
+```
+
+### 🔄 **CI/CD Pipeline Flow**
+
+**Step-by-Step Automation:**
+
+1. **Developer Push** → Code pushed to GitHub repository
+
+2. **Webhook Trigger** → GitHub sends webhook to Jenkins server
+
+3. **Jenkins Pipeline Starts** (6 automated stages):
+   - **Checkout**: Pull latest code from GitHub
+   - **Build**: Create ARM64 Docker images (frontend + backend)
+   - **Test**: Run automated test suites
+   - **Push**: Upload images to Docker Hub registry
+   - **Deploy**: Execute Ansible playbook
+   - **Health Check**: Verify deployment success
+
+4. **Ansible Deployment** → Jenkins runs Ansible to:
+   - SSH into Application Server
+   - Pull latest Docker images from Docker Hub
+   - Update docker-compose configuration
+   - Restart containers with zero downtime
+   - Validate application health
+
+5. **Application Live** → Users access the updated application
+
+### 🛠 **Ansible Configuration Management**
+
+**Ansible runs from Jenkins server and:**
+- Manages Application Server configuration
+- Deploys Docker containers
+- Updates environment variables
+- Performs rolling restarts
+- Validates deployment health
+- Provides rollback capabilities
+
+**Key Ansible Features:**
+- **Idempotent**: Safe to run multiple times
+- **Zero Downtime**: Rolling deployments
+- **Environment Specific**: Dynamic configurations
+- **Health Monitoring**: Post-deployment verification
+
+### 🚀 **Complete Automation Result**
+
+**From Code to Production in 3-5 minutes:**
+```bash
+git push origin main
+# → GitHub webhook triggers Jenkins
+# → Jenkins builds ARM64 images
+# → Images pushed to Docker Hub
+# → Ansible deploys to production
+# → Health checks verify success
+# → Application live with new changes
+```
+
+**Production Architecture:**
+- **Jenkins Server**: Handles all CI/CD operations
+- **Application Server**: Hosts containerized React + Node.js app
+- **RDS Database**: Provides persistent MySQL storage
+- **Docker Hub**: Stores versioned container images
+- **Ansible**: Manages deployment automation
 
 ### Multi-Server Architecture
 
 #### Jenkins Server (EC2 Instance #1)
 - **Purpose**: CI/CD automation and build orchestration
-- **Instance Type**: t3.medium (2 vCPU, 4GB RAM)
+- **Instance Type**: t4g.small (ARM64 Graviton2, 2GB RAM)
 - **Services**: Jenkins, Docker, Ansible
 - **Responsibilities**:
   - GitHub webhook integration
@@ -203,7 +298,7 @@ terraform apply   # Deploy: 2x EC2 instances + RDS + Security Groups
 ```
 
 **Terraform Creates:**
-- **Jenkins Server**: t3.medium EC2 with Docker & Jenkins
+- **Jenkins Server**: t4g.small ARM64 EC2 with Docker & Jenkins
 - **App Server**: t4g.small ARM64 EC2 for production
 - **RDS MySQL**: Managed database with automated backups
 - **Security Groups**: Proper network isolation and access control
