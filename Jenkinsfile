@@ -22,7 +22,7 @@ pipeline {
                         echo 'Building Frontend Docker image for ARM64...'
                         script {
                             dir('frontend') {
-                                sh "docker build --platform linux/arm64 -t ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG} ."
+                                sh "docker build --platform linux/arm64 --build-arg VITE_API_URL=http://23.20.92.144:5000 -t ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG} ."
                             }
                         }
                     }
