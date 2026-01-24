@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Plane, MapPin, CheckCircle, Lock, TrendingUp, Users, Globe2, Clock, Facebook, Twitter, Instagram, Github, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plane, MapPin, CheckCircle, Lock, TrendingUp, Users, Globe2, Clock, Facebook, Twitter, Instagram, Github, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function Landing() {
@@ -113,7 +113,7 @@ export default function Landing() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link 
               to="/signup" 
-              className="group bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 flex items-center gap-2"
+              className="group bg-linear-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 flex items-center gap-2"
             >
               Start Your Adventure
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -138,7 +138,7 @@ export default function Landing() {
         <div className="grid md:grid-cols-3 gap-8">
           {/* Feature 1 */}
           <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+            <div className="w-16 h-16 bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
               <MapPin className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">Create Your List</h3>
@@ -149,7 +149,7 @@ export default function Landing() {
 
           {/* Feature 2 */}
           <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
-            <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+            <div className="w-16 h-16 bg-linear-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
               <CheckCircle className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">Track Progress</h3>
@@ -160,7 +160,7 @@ export default function Landing() {
 
           {/* Feature 3 */}
           <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+            <div className="w-16 h-16 bg-linear-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
               <Lock className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">Secure & Private</h3>
@@ -172,7 +172,7 @@ export default function Landing() {
       </section>
 
       {/* Stats Section */}
-      <section className="bg-gradient-to-br from-blue-600 to-blue-800 py-16">
+      <section className="bg-linear-to-br from-blue-600 to-blue-800 py-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
             <div className="flex flex-col items-center">
@@ -200,7 +200,7 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
+      <section className="py-20 bg-linear-to-br from-gray-50 to-gray-100">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Ready to Start Your Journey?
@@ -210,7 +210,7 @@ export default function Landing() {
           </p>
           <Link 
             to="/signup" 
-            className="inline-block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-10 py-5 rounded-full font-bold text-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
+            className="inline-block bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-10 py-5 rounded-full font-bold text-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
           >
             Create Free Account
           </Link>

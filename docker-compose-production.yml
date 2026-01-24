@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     image: yrcd27/travel-bucket-list-backend:latest

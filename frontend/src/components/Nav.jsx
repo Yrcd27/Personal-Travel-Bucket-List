@@ -61,8 +61,8 @@ function Nav() {
             to="/" 
             className="flex items-center gap-1 text-xl font-bold text-gray-900 hover:text-blue-600 transition"
           >
-            <span className="hidden sm:inline">velogue</span>
-            <span className="sm:hidden">velogue</span>
+            <span className="hidden sm:inline">Travelogue</span>
+            <span className="sm:hidden">Travelogue</span>
             <Globe2 className="w-6 h-6" />
           </Link>
 
@@ -102,7 +102,7 @@ function Nav() {
                 </Link>
                 <Link 
                   to="/signup" 
-                  className="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5"
+                  className="px-5 py-2 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5"
                 >
                   Sign up
                 </Link>
@@ -180,7 +180,7 @@ function Nav() {
                 <Link
                   to="/signup"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block w-full text-center px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold shadow-md"
+                  className="block w-full text-center px-4 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold shadow-md"
                 >
                   Sign up
                 </Link>

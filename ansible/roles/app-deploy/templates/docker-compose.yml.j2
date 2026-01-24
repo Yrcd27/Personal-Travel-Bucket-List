@@ -1,10 +1,6 @@
-version: '3.8'
-
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: yrcd27/travel-bucket-list-backend:latest
     container_name: travel-backend
     restart: always
     environment:
@@ -20,18 +16,9 @@ services:
       - "{{ backend_port }}:{{ backend_port }}"
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:{{ backend_port }}/api/destinations"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        VITE_API_URL: http://{{ ansible_host }}:{{ backend_port }}
+    image: yrcd27/travel-bucket-list-frontend:latest
     container_name: travel-frontend
     restart: always
     ports:
@@ -40,11 +27,6 @@ services:
       - app-network
     depends_on:
       - backend
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
 networks:
   app-network:

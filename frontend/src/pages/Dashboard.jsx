@@ -168,7 +168,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-56px)] bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-[calc(100vh-56px)] bg-linear-to-br from-gray-50 to-blue-50">
       <div className="max-w-7xl mx-auto p-6 pt-10">
         {/* Header */}
         <div className="mb-8">
@@ -182,7 +182,7 @@ export default function Dashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white">
+          <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-100 mb-1">Total Destinations</p>
@@ -192,7 +192,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl shadow-lg p-6 text-white">
+          <div className="bg-linear-to-br from-emerald-500 to-emerald-600 rounded-2xl shadow-lg p-6 text-white">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-emerald-100 mb-1">Visited</p>
@@ -202,7 +202,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl shadow-lg p-6 text-white">
+          <div className="bg-linear-to-br from-amber-500 to-amber-600 rounded-2xl shadow-lg p-6 text-white">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-amber-100 mb-1">Pending</p>
@@ -262,7 +262,7 @@ export default function Dashboard() {
                 resetForm();
                 setShowAddModal(true);
               }}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 w-full md:w-auto flex items-center gap-2 justify-center"
+              className="bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 w-full md:w-auto flex items-center gap-2 justify-center"
             >
               <Plus className="w-5 h-5" />
               Add Destination
@@ -462,7 +462,7 @@ export default function Dashboard() {
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={handleAddDestination}
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition"
+                  className="flex-1 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition"
                 >
                   {editingId ? "Update" : "Add"} Destination
                 </button>
