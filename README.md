@@ -1,14 +1,26 @@
-# Personal Travel Bucket List
+<div align="center">
+
+# Personal Travel Bucket List 🌍
 
 A full-stack web application for managing your travel bucket list with complete DevOps automation pipeline.
 
-## Live Demo
+## 🛠 Technology Stack
 
-- **Frontend**: http://YOUR_SERVER_IP:5173
-- **Backend API**: http://YOUR_SERVER_IP:5000
-- **Jenkins CI/CD**: http://YOUR_JENKINS_IP:8080
+[![React](https://img.shields.io/badge/React-18.0+-61DAFB?style=flat&logo=react&logoColor=black)](https://reactjs.org)
+[![Node.js](https://img.shields.io/badge/Node.js-18.0+-339933?style=flat&logo=node.js&logoColor=white)](https://nodejs.org)
+[![Express](https://img.shields.io/badge/Express-4.18+-000000?style=flat&logo=express&logoColor=white)](https://expressjs.com)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat&logo=mysql&logoColor=white)](https://www.mysql.com)
+[![Docker](https://img.shields.io/badge/Docker-24.0+-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com)
+[![Jenkins](https://img.shields.io/badge/Jenkins-2.400+-D24939?style=flat&logo=jenkins&logoColor=white)](https://www.jenkins.io)
+[![Terraform](https://img.shields.io/badge/Terraform-1.0+-623CE4?style=flat&logo=terraform&logoColor=white)](https://www.terraform.io)
+[![Ansible](https://img.shields.io/badge/Ansible-2.9+-EE0000?style=flat&logo=ansible&logoColor=white)](https://www.ansible.com)
+[![AWS](https://img.shields.io/badge/AWS-EC2%20%7C%20RDS-232F3E?style=flat&logo=amazon-aws&logoColor=white)](https://aws.amazon.com)
+[![Vite](https://img.shields.io/badge/Vite-4.0+-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.0+-06B6D4?style=flat&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 
-## Table of Contents
+</div>
+
+## 📋 Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -20,7 +32,7 @@ A full-stack web application for managing your travel bucket list with complete 
 - [API Documentation](#api-documentation)
 - [Contributing](#contributing)
 
-## Features
+## ✨ Features
 
 - **User Authentication**: Secure JWT-based login/signup
 - **Destination Management**: Add, edit, delete travel destinations
@@ -55,7 +67,7 @@ A full-stack web application for managing your travel bucket list with complete 
 - **AWS** - Cloud platform (EC2, RDS)
 - **Docker Hub** - Container registry
 
-## Architecture
+## 🏗 Architecture
 
 ### Complete DevOps Infrastructure
 
@@ -140,7 +152,7 @@ This project demonstrates a **production-grade DevOps pipeline** with full autom
 - **Environment-specific configurations** via templates
 - **Rollback capabilities** for failed deployments
 
-## Prerequisites
+## 📋 Prerequisites
 
 - **Node.js** 18+
 - **Docker** & Docker Compose
@@ -149,7 +161,7 @@ This project demonstrates a **production-grade DevOps pipeline** with full autom
 - **Ansible** 2.9+
 - **Git**
 
-## Quick Start
+## 🚀 Quick Start
 
 ### 1. Clone Repository
 ```bash
@@ -175,7 +187,7 @@ npm run dev
 docker-compose up -d
 ```
 
-## DevOps Pipeline
+## 🔄 DevOps Pipeline
 
 ### Infrastructure Provisioning (Terraform)
 
@@ -256,7 +268,7 @@ git push origin main
 - **Traceability**: Complete audit trail of all changes
 - **Recovery**: Automated rollback on failures
 
-## Deployment
+## 🚀 Deployment
 
 ### Production-Grade Deployment
 
@@ -292,7 +304,7 @@ docker-compose pull
 docker-compose up -d
 ```
 
-## API Documentation
+## 📚 API Documentation
 
 ### Authentication Endpoints
 ```
@@ -327,7 +339,7 @@ curl -X POST http://YOUR_SERVER_IP:5000/api/destinations \
   -d '{"name":"Paris","country":"France","description":"City of Light"}'
 ```
 
-## Configuration
+## 🔧 Configuration
 
 ### Environment Variables
 ```env
@@ -348,7 +360,7 @@ VITE_API_URL=http://your-backend-url:5000
 - **Frontend**: `yrcd27/travel-bucket-list-frontend:latest`
 - **Backend**: `yrcd27/travel-bucket-list-backend:latest`
 
-## Project Structure
+## 🏗 Project Structure
 
 ```
 Personal-Travel-Bucket-List/
@@ -370,7 +382,7 @@ Personal-Travel-Bucket-List/
 └── docker-compose-production.yml
 ```
 
-## Security Features
+## 🔒 Security Features
 
 - **JWT Authentication** with secure token handling
 - **Password Hashing** using bcrypt
@@ -379,7 +391,7 @@ Personal-Travel-Bucket-List/
 - **Environment Variables** for sensitive data
 - **SQL Injection Protection** with parameterized queries
 
-## Monitoring & Operations
+## 📊 Monitoring & Operations
 
 ### Real-Time Health Monitoring
 
@@ -417,7 +429,7 @@ docker logs travel-frontend -f   # Frontend server logs
 - **Performance Monitoring**: Response time analysis
 - **Security Auditing**: Authentication and authorization logs
 
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create feature branch (`git checkout -b feature/amazing-feature`)
@@ -425,17 +437,17 @@ docker logs travel-frontend -f   # Frontend server logs
 4. Push to branch (`git push origin feature/amazing-feature`)
 5. Open Pull Request
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Author
+## 👨‍💻 Author
 
 **Yrcd27**
 - GitHub: [@yrcd27](https://github.com/yrcd27)
 - Docker Hub: [yrcd27](https://hub.docker.com/u/yrcd27)
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
 - AWS for cloud infrastructure
 - Docker for containerization
@@ -444,4 +456,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Star this repository if you found it helpful!**
+**⭐ Star this repository if you found it helpful!**
