@@ -88,3 +88,34 @@ output "database_name" {
   description = "Database name"
   value       = aws_db_instance.main.db_name
 }
+
+# Jenkins Server Outputs
+output "jenkins_instance_id" {
+  description = "ID of the Jenkins EC2 instance"
+  value       = aws_instance.jenkins.id
+}
+
+output "jenkins_public_ip" {
+  description = "Public IP address of Jenkins server"
+  value       = aws_eip.jenkins.public_ip
+}
+
+output "jenkins_private_ip" {
+  description = "Private IP address of Jenkins server"
+  value       = aws_instance.jenkins.private_ip
+}
+
+output "jenkins_url" {
+  description = "URL to access Jenkins"
+  value       = "http://${aws_eip.jenkins.public_ip}:8080"
+}
+
+output "jenkins_ssh_command" {
+  description = "SSH command to connect to Jenkins server"
+  value       = "ssh -i ~/.ssh/${var.key_name}.pem ubuntu@${aws_eip.jenkins.public_ip}"
+}
+
+output "github_webhook_url" {
+  description = "GitHub webhook URL for Jenkins"
+  value       = "http://${aws_eip.jenkins.public_ip}:8080/github-webhook/"
+}

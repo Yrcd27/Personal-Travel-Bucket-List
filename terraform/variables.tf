@@ -25,6 +25,12 @@ variable "instance_type" {
   default     = "t4g.small" # ARM-based, 2GB RAM
 }
 
+variable "jenkins_instance_type" {
+  description = "EC2 instance type for Jenkins server"
+  type        = string
+  default     = "t4g.small" # ARM-based, 2GB RAM - sufficient for Docker builds
+}
+
 variable "key_name" {
   description = "Name of the SSH key pair for EC2 access"
   type        = string

@@ -246,3 +246,152 @@ resource "aws_eip" "app_server" {
   # EIP depends on internet gateway
   depends_on = [aws_internet_gateway.main]
 }
+
+# ====================
+# JENKINS SERVER
+# ====================
+
+# Security Group for Jenkins
+resource "aws_security_group" "jenkins" {
+  name        = "${var.project_name}-jenkins-sg"
+  description = "Security group for Jenkins CI/CD server"
+  vpc_id      = aws_vpc.main.id
+
+  # SSH access
+  ingress {
+    description = "SSH from allowed IPs"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = var.allowed_ssh_ips
+  }
+
+  # Jenkins Web UI and GitHub Webhook
+  ingress {
+    description = "Jenkins Web UI and GitHub Webhook"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Allow Jenkins to communicate with app server (SSH for deployment)
+  egress {
+    description = "SSH to app server"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_eip.app_server.public_ip}/32"]
+  }
+
+  # Outbound traffic - allow all (for Docker Hub, apt, etc.)
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-jenkins-sg"
+  }
+}
+
+# Jenkins EC2 Instance
+resource "aws_instance" "jenkins" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = var.jenkins_instance_type
+  key_name      = var.key_name
+
+  subnet_id                   = aws_subnet.public.id
+  vpc_security_group_ids      = [aws_security_group.jenkins.id]
+  associate_public_ip_address = true
+
+  # Storage - Jenkins needs more space for builds
+  root_block_device {
+    volume_size = 30 # GB (more space for Docker images)
+    volume_type = "gp3"
+    encrypted   = true
+  }
+
+  # User data script - Install Docker and prepare for Jenkins
+  user_data = <<-EOF
+              #!/bin/bash
+              set -e
+              
+              # Log all output
+              exec > >(tee /var/log/user-data.log)
+              exec 2>&1
+              
+              echo "=== Starting Jenkins Server Initialization ==="
+              
+              # 1. Create 2GB swap space
+              echo "Creating swap space..."
+              dd if=/dev/zero of=/swapfile bs=128M count=16
+              chmod 600 /swapfile
+              mkswap /swapfile
+              swapon /swapfile
+              echo '/swapfile none swap sw 0 0' >> /etc/fstab
+              
+              # 2. Optimize swap usage
+              echo "vm.swappiness=10" >> /etc/sysctl.conf
+              echo "vm.vfs_cache_pressure=50" >> /etc/sysctl.conf
+              sysctl -p
+              
+              # 3. Update system
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get update -y
+              apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+              
+              # 4. Install Docker (for building images)
+              apt-get install -y ca-certificates curl gnupg lsb-release
+              mkdir -p /etc/apt/keyrings
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+              echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+              apt-get update -y
+              apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+              
+              # 5. Configure Docker for Jenkins
+              usermod -aG docker ubuntu
+              systemctl enable docker
+              systemctl start docker
+              
+              # 6. Install essential tools
+              apt-get install -y git curl wget vim htop
+              
+              # 7. Create Jenkins directory
+              mkdir -p /var/jenkins_home
+              chown -R ubuntu:ubuntu /var/jenkins_home
+              
+              # 8. Log completion
+              echo "=== Jenkins Server Initialization Completed ===" 
+              echo "Ready for Jenkins installation" > /home/ubuntu/jenkins-ready.txt
+              docker --version >> /home/ubuntu/jenkins-ready.txt
+              date >> /home/ubuntu/jenkins-ready.txt
+              EOF
+
+  tags = {
+    Name        = "${var.project_name}-jenkins"
+    Environment = var.environment
+    Role        = "CI/CD"
+  }
+
+  disable_api_termination = false
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# Elastic IP for Jenkins
+resource "aws_eip" "jenkins" {
+  instance = aws_instance.jenkins.id
+  domain   = "vpc"
+
+  tags = {
+    Name = "${var.project_name}-jenkins-eip"
+  }
+
+  depends_on = [aws_internet_gateway.main]
+}

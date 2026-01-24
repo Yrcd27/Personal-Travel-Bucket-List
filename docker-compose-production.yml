@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  backend:
+    image: yrcd27/travel-bucket-list-backend:latest
+    container_name: travel-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: travel-bucket-db.ck3k822u2a5v.us-east-1.rds.amazonaws.com
+      DB_USER: admin
+      DB_PASSWORD: TravelBucket2024SecurePass
+      DB_NAME: travelbucket
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      PORT: 5000
+      NODE_ENV: production
+      CORS_ORIGIN: http://23.20.92.144:5173
+    networks:
+      - app-network
+
+  frontend:
+    image: yrcd27/travel-bucket-list-frontend:latest
+    container_name: travel-frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
