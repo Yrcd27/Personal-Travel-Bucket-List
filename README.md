@@ -223,26 +223,7 @@ git push origin main
   - Security group isolation
   - SSL/TLS encryption
 
-### DevOps Pipeline Excellence
-
-#### Automated Workflow
-1. **Code Push** → GitHub repository
-2. **Webhook Trigger** → Jenkins server receives notification
-3. **Build Phase** → Jenkins creates ARM64 Docker images
-4. **Test Phase** → Automated testing suite execution
-5. **Registry Push** → Images uploaded to Docker Hub
-6. **Deployment Phase** → Ansible deploys to production server
-7. **Health Check** → Automated verification of deployment
-8. **Notification** → Pipeline status reporting
-
-#### Infrastructure as Code (Terraform)
-- **Complete AWS infrastructure** provisioned via code
-- **Version controlled** infrastructure changes
-- **Reproducible environments** across dev/staging/prod
-- **Cost optimized** with appropriate instance sizing
-
-#### Configuration Management (Ansible)
-- **Idempotent deployments** ensure consistency
+## 📋 Prerequisitesre consistency
 - **Zero-downtime deployments** with health checks
 - **Environment-specific configurations** via templates
 - **Rollback capabilities** for failed deployments
