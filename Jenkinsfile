@@ -136,7 +136,7 @@ pipeline {
                         echo "Testing frontend..."
                         curl -f http://23.20.92.144:5173 || exit 1
                         echo "Testing backend..."
-                        curl -f http://23.20.92.144:5000 || exit 1
+                        curl -f http://23.20.92.144:5000/api || curl -f http://23.20.92.144:5000 || exit 1
                         echo "✓ All services are healthy!"
                     '''
                 }
