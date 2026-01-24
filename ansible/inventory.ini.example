@@ -1,0 +1,9 @@
+[app_servers]
+app-server ansible_host=YOUR_EC2_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/YOUR_KEY.pem
+
+[app_servers:vars]
+backend_port=5000
+frontend_port=5173
+rds_address=YOUR_RDS_ENDPOINT
+db_password=YOUR_DB_PASSWORD
+jwt_secret=YOUR_JWT_SECRET
