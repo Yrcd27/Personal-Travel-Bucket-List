@@ -109,19 +109,13 @@ pipeline {
         
         stage('Deploy to EC2') {
             steps {
-                echo 'Deploying to EC2 instance...'
+                echo 'Deploying to EC2 using Ansible...'
                 script {
-                    sh '''
-                        ssh -i ~/.ssh/travel-bucket-key.pem -o StrictHostKeyChecking=no ubuntu@23.20.92.144 "
-                            cd /home/ubuntu/travel-bucket-list
-                            echo 'Pulling latest images from Docker Hub...'
-                            docker compose pull
-                            echo 'Restarting containers...'
-                            docker compose up -d --force-recreate
-                            echo 'Deployment complete!'
-                            docker ps
-                        "
-                    '''
+                    dir('ansible') {
+                        sh '''
+                            ansible-playbook -i inventory.ini deploy.yml --extra-vars "deploy_version=latest"
+                        '''
+                    }
                 }
             }
         }
