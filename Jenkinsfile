@@ -114,8 +114,7 @@ pipeline {
                     dir('ansible') {
                         withCredentials([file(credentialsId: 'ansible-inventory', variable: 'ANSIBLE_INVENTORY')]) {
                             sh '''
-                                cp "$ANSIBLE_INVENTORY" /tmp/ansible-inventory.ini
-                                ansible-playbook -i /tmp/ansible-inventory.ini deploy.yml --extra-vars "deploy_version=latest"
+                                ansible-playbook -i "$ANSIBLE_INVENTORY" deploy.yml --extra-vars "deploy_version=latest"
                             '''
                         }
                     }
