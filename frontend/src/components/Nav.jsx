@@ -62,7 +62,7 @@ function Nav() {
             className="flex items-center gap-1 text-xl font-bold text-gray-900 hover:text-blue-600 transition"
           >
             <span className="hidden sm:inline">Travelogue</span>
-            <span className="sm:hidden">Traveloguee</span>
+            <span className="sm:hidden">Travelogue</span>
             <Globe2 className="w-6 h-6" />
           </Link>
 
