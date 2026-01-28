@@ -241,8 +241,8 @@ git push origin main
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/Personal-Travel-Bucket-List.git
-cd Personal-Travel-Bucket-List
+git clone https://github.com/YOUR_USERNAME/Travelogue.git
+cd Travelogue
 ```
 
 ### 2. Local Development
@@ -375,7 +375,7 @@ ansible-playbook -i inventory.ini deploy.yml
 
 # Using Docker Compose
 ssh ubuntu@YOUR_SERVER_IP
-cd /home/ubuntu/travel-bucket-list
+cd /home/ubuntu/travelogue
 docker-compose pull
 docker-compose up -d
 ```
@@ -433,13 +433,13 @@ VITE_API_URL=http://your-backend-url:5000
 ```
 
 ### Docker Hub Images
-- **Frontend**: `yrcd27/travel-bucket-list-frontend:latest`
-- **Backend**: `yrcd27/travel-bucket-list-backend:latest`
+- **Frontend**: `yrcd27/travelogue-frontend:latest`
+- **Backend**: `yrcd27/travelogue-backend:latest`
 
 ## 🏗 Project Structure
 
 ```
-Personal-Travel-Bucket-List/
+Travelogue/
 ├── frontend/                 # React frontend
 │   ├── src/
 │   │   ├── components/      # Reusable components

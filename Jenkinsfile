@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_HUB_REPO = 'yrcd27/travel-bucket-list'
+        DOCKER_HUB_REPO = 'yrcd27/travelogue'
         DOCKER_HUB_CREDENTIALS = credentials('dockerhub-credentials')
         IMAGE_TAG = 'latest'
     }

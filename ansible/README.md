@@ -72,16 +72,16 @@ ssh ubuntu@50.16.238.185
 ssh ubuntu@50.16.238.185 "docker ps"
 
 # View logs (live)
-ssh ubuntu@50.16.238.185 "cd travel-bucket-list && docker-compose logs -f"
+ssh ubuntu@50.16.238.185 "cd travelogue && docker-compose logs -f"
 
 # Restart application
-ssh ubuntu@50.16.238.185 "cd travel-bucket-list && docker-compose restart"
+ssh ubuntu@50.16.238.185 "cd travelogue && docker-compose restart"
 
 # Stop application
-ssh ubuntu@50.16.238.185 "cd travel-bucket-list && docker-compose down"
+ssh ubuntu@50.16.238.185 "cd travelogue && docker-compose down"
 
 # Start application
-ssh ubuntu@50.16.238.185 "cd travel-bucket-list && docker-compose up -d"
+ssh ubuntu@50.16.238.185 "cd travelogue && docker-compose up -d"
 
 # Check resource usage
 ssh ubuntu@50.16.238.185 "docker stats --no-stream"
@@ -126,7 +126,7 @@ ansible-playbook deploy.yml -vv
 ssh ubuntu@50.16.238.185 "free -h && df -h"
 
 # View container logs
-ssh ubuntu@50.16.238.185 "cd travel-bucket-list && docker-compose logs"
+ssh ubuntu@50.16.238.185 "cd travelogue && docker-compose logs"
 ```
 
 ### Container Issues
@@ -228,10 +228,10 @@ Before running Ansible:
 
 ```bash
 # Stop everything
-ssh ubuntu@50.16.238.185 "cd travel-bucket-list && docker-compose down"
+ssh ubuntu@50.16.238.185 "cd travelogue && docker-compose down"
 
 # Clean restart
-ssh ubuntu@50.16.238.185 "cd travel-bucket-list && docker-compose down -v && docker-compose up -d"
+ssh ubuntu@50.16.238.185 "cd travelogue && docker-compose down -v && docker-compose up -d"
 
 # Fresh deployment
 ansible-playbook deploy.yml --tags deploy
@@ -240,3 +240,5 @@ ansible-playbook deploy.yml --tags deploy
 ---
 
 **Need help?** Check [ANSIBLE_SETUP_GUIDE.md](../ANSIBLE_SETUP_GUIDE.md) for comprehensive instructions!
+
+

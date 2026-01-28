@@ -9,9 +9,9 @@
 
   vars:
     # Application settings
-    app_name: travel-bucket-list
+    app_name: travelogue
     app_user: ubuntu
-    app_dir: /home/ubuntu/travel-bucket-list
+    app_dir: /home/ubuntu/travelogue
 
     # Docker settings
     docker_compose_version: "2.24.5"
@@ -69,3 +69,4 @@
           - "1. Visit http://{{ ansible_host }}:{{ frontend_port }} in your browser"
           - "2. Create an account and test the application"
           - "3. Check logs: ssh ubuntu@{{ ansible_host }} 'cd {{ app_dir }} && docker compose logs'"
+

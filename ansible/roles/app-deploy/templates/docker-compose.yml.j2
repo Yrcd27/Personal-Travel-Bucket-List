@@ -1,6 +1,6 @@
 services:
   backend:
-    image: yrcd27/travel-bucket-list-backend:latest
+    image: yrcd27/travelogue-backend:latest
     container_name: travel-backend
     restart: always
     environment:
@@ -18,7 +18,7 @@ services:
       - app-network
 
   frontend:
-    image: yrcd27/travel-bucket-list-frontend:latest
+    image: yrcd27/travelogue-frontend:latest
     container_name: travel-frontend
     restart: always
     ports:
@@ -31,3 +31,4 @@ services:
 networks:
   app-network:
     driver: bridge
+
