@@ -112,9 +112,12 @@ pipeline {
                 echo 'Deploying to EC2 using Ansible...'
                 script {
                     dir('ansible') {
-                        sh '''
-                            ansible-playbook -i inventory.ini deploy.yml --extra-vars "deploy_version=latest"
-                        '''
+                        withCredentials([file(credentialsId: 'ansible-inventory', variable: 'ANSIBLE_INVENTORY')]) {
+                            sh '''
+                                cp "$ANSIBLE_INVENTORY" inventory.ini
+                                ansible-playbook -i inventory.ini deploy.yml --extra-vars "deploy_version=latest"
+                            '''
+                        }
                     }
                 }
             }
