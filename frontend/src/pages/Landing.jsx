@@ -345,7 +345,7 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-gray-400 text-sm text-center md:text-left">
-                © {new Date().getFullYear()} Travelogue. All rights reserved. Created by Yrcd27.
+                © {new Date().getFullYear()} Travelogue. All rights reserved. Created by yRcd27.
               </p>
               <div className="flex items-center gap-6">
                 <a href="#" className="text-gray-400 hover:text-white transition text-sm flex items-center gap-1">
