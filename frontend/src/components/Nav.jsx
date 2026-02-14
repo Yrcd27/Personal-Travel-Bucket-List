@@ -197,7 +197,7 @@ function Nav() {
         title="Confirm Logout"
         message="Are you sure you want to log out? You'll need to sign in again to access your dashboard."
         confirmText="Log Out"
-        type="warning"
+        type="danger"
       />
     </nav>
   );
