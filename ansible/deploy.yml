@@ -18,7 +18,7 @@
 
     # RDS Database settings (from Terraform outputs)
     rds_address: "travel-bucket-db.ck3k822u2a5v.us-east-1.rds.amazonaws.com"
-    db_password: "TravelBucket2024SecurePass"
+    db_password: "TravelBucket2024!"
 
     # JWT settings
     jwt_secret: "your-super-secret-jwt-key-change-in-production"

@@ -53,6 +53,6 @@ variable "allowed_ssh_ips" {
 variable "db_password" {
   description = "Password for RDS MySQL database"
   type        = string
-  default     = "TravelBucket2024SecurePass"
+  default     = "TravelBucket2024!"
   sensitive   = true
 }

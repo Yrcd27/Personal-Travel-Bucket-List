@@ -1,7 +1,7 @@
 # Main Terraform Configuration
 # This is the heart of your infrastructure - it creates everything!
 
-# Data source: Get the latest Ubuntu 22.04 AMI for ARM64 (Graviton)
+# Data source: Find & Get the latest Ubuntu 22.04 AMI for ARM64 (Graviton)
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"] # Canonical (Ubuntu official)
