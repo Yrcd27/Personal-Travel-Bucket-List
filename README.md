@@ -1,535 +1,402 @@
 <div align="center">
 
-# Travelogue 🌍 - Personal Travel Bucket List 
+# Travelogue - Personal Travel Bucket List
 
-A full-stack web application for managing your travel bucket list with complete DevOps automation pipeline.
+A full-stack travel bucket list app with a complete DevOps pipeline — from infrastructure provisioning to automated deployment.
 
-## 🛠 Technology Stack
-
-[![React](https://img.shields.io/badge/React-18.0+-61DAFB?style=flat&logo=react&logoColor=black)](https://reactjs.org)
-[![Node.js](https://img.shields.io/badge/Node.js-18.0+-339933?style=flat&logo=node.js&logoColor=white)](https://nodejs.org)
-[![Express](https://img.shields.io/badge/Express-4.18+-000000?style=flat&logo=express&logoColor=white)](https://expressjs.com)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react&logoColor=black)](https://reactjs.org)
+[![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=flat&logo=node.js&logoColor=white)](https://nodejs.org)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat&logo=mysql&logoColor=white)](https://www.mysql.com)
-[![Docker](https://img.shields.io/badge/Docker-24.0+-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com)
+[![Docker](https://img.shields.io/badge/Docker-24+-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com)
 [![Jenkins](https://img.shields.io/badge/Jenkins-2.400+-D24939?style=flat&logo=jenkins&logoColor=white)](https://www.jenkins.io)
 [![Terraform](https://img.shields.io/badge/Terraform-1.0+-623CE4?style=flat&logo=terraform&logoColor=white)](https://www.terraform.io)
 [![Ansible](https://img.shields.io/badge/Ansible-2.9+-EE0000?style=flat&logo=ansible&logoColor=white)](https://www.ansible.com)
-[![AWS](https://img.shields.io/badge/AWS-EC2%20%7C%20RDS-232F3E?style=flat&logo=amazon-aws&logoColor=white)](https://aws.amazon.com)
-[![Vite](https://img.shields.io/badge/Vite-4.0+-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.0+-06B6D4?style=flat&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![AWS](https://img.shields.io/badge/AWS-EC2%20|%20RDS-232F3E?style=flat&logo=amazon-aws&logoColor=white)](https://aws.amazon.com)
 
 </div>
 
-## 📋 Table of Contents
+---
 
-- [Features](#features)
+## Table of Contents
+
+- [Architecture Overview](#architecture-overview)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Project Structure](#project-structure)
 - [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [DevOps Pipeline](#devops-pipeline)
-- [Deployment](#deployment)
-- [API Documentation](#api-documentation)
-- [Contributing](#contributing)
+- [Database Schema](#database-schema)
+- [API Reference](#api-reference)
+- [Authentication Flow](#authentication-flow)
+- [Getting Started](#getting-started)
+- [Infrastructure Setup](#infrastructure-setup)
+- [Environment Variables](#environment-variables)
 
-## ✨ Features
+---
 
-- **User Authentication**: Secure JWT-based login/signup
-- **Destination Management**: Add, edit, delete travel destinations
-- **Progress Tracking**: Mark destinations as visited
-- **Responsive Design**: Mobile-first UI with TailwindCSS
-- **Image Carousel**: Beautiful hero section with travel images
-- **Secure Backend**: Input validation and error handling
+## Architecture Overview
+
+```mermaid
+graph TB
+    subgraph "Developer"
+        DEV[Git Push]
+    end
+
+    subgraph "GitHub"
+        GH[Repository]
+    end
+
+    subgraph "AWS Cloud"
+        subgraph "Jenkins EC2 — t4g.small"
+            JK[Jenkins :8080]
+            ANS[Ansible]
+        end
+
+        subgraph "App Server EC2 — t4g.small"
+            FE["Frontend (Nginx) :80 → mapped :5173"]
+            BE["Backend (Express) :5000"]
+        end
+
+        subgraph "RDS — db.t3.micro"
+            DB[(MySQL 8.0<br/>travelbucket)]
+        end
+    end
+
+    subgraph "Docker Hub"
+        DH["yrcd27/travelogue-frontend<br/>yrcd27/travelogue-backend"]
+    end
+
+    DEV -->|push| GH
+    GH -->|webhook| JK
+    JK -->|build & push| DH
+    JK -->|triggers| ANS
+    ANS -->|SSH deploy| FE
+    ANS -->|SSH deploy| BE
+    DH -->|pull images| FE
+    DH -->|pull images| BE
+    BE -->|TCP 3306| DB
+    FE -->|HTTP :5000| BE
+
+    style JK fill:#D24939,color:#fff
+    style FE fill:#61DAFB,color:#000
+    style BE fill:#339933,color:#fff
+    style DB fill:#4479A1,color:#fff
+    style DH fill:#2496ED,color:#fff
+```
+
+### AWS Infrastructure (provisioned by Terraform)
+
+| Resource | Type | Specs | Purpose |
+|----------|------|-------|---------|
+| VPC | `10.0.0.0/16` | 2 subnets, IGW, route table | Network isolation |
+| Jenkins Server | EC2 `t4g.small` | ARM64, 2 vCPU, 2GB RAM, 30GB | CI/CD + builds |
+| App Server | EC2 `t4g.small` | ARM64, 2 vCPU, 2GB RAM, 20GB | Production hosting |
+| Database | RDS `db.t3.micro` | MySQL 8.0, 20GB, encrypted | Persistent storage |
+| Elastic IPs | 2 | Static public IPs | Stable addressing |
+| Security Groups | 3 | App, Jenkins, RDS | Network firewall |
+
+---
+
+## CI/CD Pipeline
+
+```mermaid
+graph LR
+    A[Checkout] --> B[Build]
+    B --> C[Test]
+    C --> D[Push]
+    D --> E[Deploy]
+    E --> F[Health Check]
+
+    style A fill:#6c757d,color:#fff
+    style B fill:#0d6efd,color:#fff
+    style C fill:#ffc107,color:#000
+    style D fill:#2496ED,color:#fff
+    style E fill:#198754,color:#fff
+    style F fill:#dc3545,color:#fff
+```
+
+| Stage | What happens |
+|-------|-------------|
+| **Checkout** | Pull latest code from GitHub |
+| **Build** | Build ARM64 Docker images for frontend and backend (parallel) |
+| **Test** | Run backend tests (Mocha) + frontend lint (ESLint) + smoke tests (parallel) |
+| **Push** | Authenticate and push images to Docker Hub |
+| **Deploy** | Ansible SSHs into App Server, pulls images, recreates containers |
+| **Health Check** | Wait 15s, then `curl` the frontend to verify it's live |
+
+**Trigger:** GitHub webhook on push to `main` → Jenkins pipeline starts automatically.
+
+---
+
+## Project Structure
+
+```
+├── frontend/                   React + Vite + TailwindCSS
+│   ├── src/
+│   │   ├── pages/              Landing, Login, Signup, Dashboard
+│   │   ├── components/         Nav, ProtectedRoute, ConfirmationModal
+│   │   └── lib/api.js          Axios client with JWT interceptor
+│   ├── nginx.conf              Gzip, SPA routing, security headers
+│   └── Dockerfile              Multi-stage: Node build → Nginx serve
+│
+├── backend/                    Node.js + Express
+│   ├── src/
+│   │   ├── server.js           Express app, middleware stack, port 5000
+│   │   ├── db.js               MySQL connection pool (10 connections)
+│   │   ├── routes/             auth.js, destinations.js
+│   │   └── middleware/         auth, security, validation, errorHandler
+│   ├── tests/api.test.js       Mocha test suite
+│   └── Dockerfile              Node 20 Alpine
+│
+├── db/
+│   ├── init.sql                Schema + seed data (20 users, 60+ destinations)
+│   └── destinations_data.sql   Additional sample data
+│
+├── terraform/                  AWS infrastructure
+│   ├── main.tf                 VPC, EC2 instances, security groups, EIPs
+│   ├── variables.tf            Input variables
+│   └── outputs.tf              IPs, URLs, SSH commands
+│
+├── ansible/                    Configuration management
+│   ├── deploy.yml              Main playbook (3 roles)
+│   └── roles/
+│       ├── docker/             Install Docker + Compose
+│       ├── app-deploy/         Pull images, generate compose, start containers
+│       └── health-check/       Verify containers + API endpoints
+│
+├── docker-compose.yml          Local development (MySQL + backend + frontend)
+└── Jenkinsfile                 6-stage CI/CD pipeline
+```
+
+---
 
 ## Tech Stack
 
-### Frontend
-- **React 18** - Modern UI library
-- **Vite** - Fast build tool
-- **TailwindCSS** - Utility-first CSS framework
-- **React Router** - Client-side routing
-- **Lucide React** - Beautiful icons
-- **Axios** - HTTP client
+| Layer | Technology | Details |
+|-------|-----------|---------|
+| Frontend | React 19, Vite, TailwindCSS | SPA with React Router, Axios, Lucide icons |
+| Backend | Node.js 20, Express 4.19 | REST API with JWT auth, rate limiting, input validation |
+| Database | MySQL 8.0 | Managed via AWS RDS, connection pooling |
+| Containerization | Docker, Docker Compose | Multi-stage builds, ARM64 images |
+| CI/CD | Jenkins | 6-stage pipeline with GitHub webhook trigger |
+| IaC | Terraform | VPC, EC2, RDS, security groups, elastic IPs |
+| Config Management | Ansible | 3 roles: docker install, app deploy, health check |
+| Cloud | AWS | EC2 (Graviton2 ARM64), RDS, VPC |
+| Web Server | Nginx | Static file serving, gzip, SPA routing, security headers |
 
-### Backend
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **MySQL** - Database
-- **JWT** - Authentication
-- **bcrypt** - Password hashing
-- **CORS** - Cross-origin requests
+---
 
-### DevOps & Infrastructure
-- **Docker** - Containerization
-- **Jenkins** - CI/CD pipeline
-- **Ansible** - Configuration management
-- **Terraform** - Infrastructure as Code
-- **AWS** - Cloud platform (EC2, RDS)
-- **Docker Hub** - Container registry
+## Database Schema
 
-## 🏗 Architecture
+```mermaid
+erDiagram
+    users ||--o{ destinations : "has many"
 
-### Complete DevOps Infrastructure
+    users {
+        INT id PK "AUTO_INCREMENT"
+        VARCHAR(100) name "NOT NULL"
+        VARCHAR(255) email "UNIQUE, NOT NULL"
+        VARCHAR(255) password_hash "NOT NULL"
+        TIMESTAMP created_at "DEFAULT CURRENT_TIMESTAMP"
+    }
 
-This project demonstrates a **production-grade DevOps pipeline** with full automation from code commit to deployment:
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   GitHub Repo   │───▶│  Jenkins CI/CD  │───▶│   Docker Hub    │
-│   (Source Code) │    │ (Hosted on EC2) │    │ (Image Registry)│
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                │                       │
-                                │ Ansible Deploy       │ Pull Images
-                                ▼                       ▼
-                       ┌─────────────────┐    ┌─────────────────┐
-                       │ App Server EC2  │◀───│  Ansible Deploy │
-                       │ (Production)    │    │ (from Jenkins)  │
-                       └─────────────────┘    └─────────────────┘
-                                │
-                                │ Database Connection
-                                ▼
-                       ┌─────────────────┐
-                       │   RDS MySQL     │
-                       │   (Database)    │
-                       └─────────────────┘
-
-┌─────────────────┐
-│  Terraform IaC  │ ──── Provisions All 3 Resources:
-│ (Infrastructure)│      • Jenkins Server EC2
-└─────────────────┘      • Application Server EC2
-                         • RDS MySQL Database
+    destinations {
+        INT id PK "AUTO_INCREMENT"
+        INT user_id FK "NOT NULL → users.id (CASCADE)"
+        VARCHAR(255) destination "NOT NULL"
+        VARCHAR(255) country "NOT NULL"
+        TEXT notes "nullable"
+        ENUM priority "low | medium | high (default: medium)"
+        BOOLEAN visited "DEFAULT FALSE"
+        TIMESTAMP created_at "DEFAULT CURRENT_TIMESTAMP"
+        TIMESTAMP updated_at "ON UPDATE CURRENT_TIMESTAMP"
+    }
 ```
 
-## How the Complete Pipeline Works
+---
 
-### 🏗 **Infrastructure Setup (Terraform)**
+## API Reference
 
-**Terraform provisions 3 AWS resources:**
+Base URL: `http://<server>:5000`
 
-1. **Jenkins Server (EC2)** - t4g.small ARM64 instance
-   - Hosts Jenkins CI/CD server
-   - Pre-installed with Docker and Ansible
-   - Receives GitHub webhooks on port 8080
-   - Builds ARM64 Docker images
+### Authentication — `/api/auth`
 
-2. **Application Server (EC2)** - t4g.small ARM64 instance
-   - Hosts production application
-   - Runs Docker Compose with frontend/backend
-   - Serves React app on port 5173
-   - Serves Node.js API on port 5000
+| Method | Endpoint | Auth | Body | Response |
+|--------|----------|------|------|----------|
+| `POST` | `/signup` | No | `{name, email, password}` | `201` — `{message}` |
+| `POST` | `/login` | No | `{email, password}` | `200` — `{token, user}` |
+| `GET` | `/me` | Yes | — | `200` — `{user}` |
 
-3. **RDS MySQL Database** - db.t3.micro managed database
-   - Persistent data storage
-   - Automated backups and maintenance
-   - Secure network isolation
+### Destinations — `/api/destinations`
 
-**Infrastructure Command:**
+| Method | Endpoint | Auth | Body | Response |
+|--------|----------|------|------|----------|
+| `GET` | `/` | Yes | — | `200` — `{destinations[]}` |
+| `POST` | `/` | Yes | `{destination, country, notes?, priority?}` | `201` — `{destination}` |
+| `PUT` | `/:id` | Yes | `{destination, country, notes?, priority?}` | `200` — `{destination}` |
+| `DELETE` | `/:id` | Yes | — | `200` — `{message}` |
+| `PATCH` | `/:id/visited` | Yes | — | `200` — `{destination}` (toggles visited) |
+
+### Health — `/api/health`
+
+| Method | Endpoint | Auth | Response |
+|--------|----------|------|----------|
+| `GET` | `/` | No | `200` — `{ok: true, timestamp}` |
+
+> **Auth header format:** `Authorization: Bearer <JWT_TOKEN>`
+> JWT tokens expire after **7 days**.
+
+### Middleware Stack
+
+```
+Request → Security Headers → Rate Limiter → CORS → Body Parser → [Auth] → [Validation] → Route Handler → Error Handler
+```
+
+| Middleware | Scope | Config |
+|-----------|-------|--------|
+| Security headers | All requests | X-Frame-Options, X-Content-Type-Options, X-XSS-Protection |
+| Rate limiter | API: 100 req/15min | Auth endpoints: 50 req/15min |
+| CORS | All requests | Credentials enabled, configurable origin |
+| Body parser | All requests | JSON + URL-encoded, 10MB limit |
+| JWT auth | Protected routes | Verifies token, attaches `req.user` |
+| Validation | Destination routes | Validates destination, country, priority enum |
+
+---
+
+## Authentication Flow
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Frontend
+    participant Backend
+    participant DB as MySQL
+
+    User->>Frontend: Fill signup form
+    Frontend->>Backend: POST /api/auth/signup {name, email, password}
+    Backend->>Backend: Hash password (bcrypt, 10 rounds)
+    Backend->>DB: INSERT INTO users
+    DB-->>Backend: OK
+    Backend-->>Frontend: 201 {message: "Signup successful"}
+    Frontend->>Frontend: Redirect to /login
+
+    User->>Frontend: Fill login form
+    Frontend->>Backend: POST /api/auth/login {email, password}
+    Backend->>DB: SELECT user by email
+    DB-->>Backend: User record
+    Backend->>Backend: Compare password hash
+    Backend->>Backend: Sign JWT {sub, email, name} (7d expiry)
+    Backend-->>Frontend: 200 {token, user}
+    Frontend->>Frontend: Store token in localStorage
+
+    User->>Frontend: Visit /dashboard
+    Frontend->>Backend: GET /api/destinations (Bearer token)
+    Backend->>Backend: Verify JWT
+    Backend->>DB: SELECT destinations WHERE user_id = ?
+    DB-->>Backend: User's destinations
+    Backend-->>Frontend: 200 {destinations[]}
+    Frontend->>User: Render dashboard
+```
+
+---
+
+## Getting Started
+
+### Local Development with Docker (recommended)
+
 ```bash
-terraform apply  # Creates all 3 resources with networking
+git clone https://github.com/Yrcd27/Personal-Travel-Bucket-List.git
+cd Personal-Travel-Bucket-List
+docker compose up -d
 ```
 
-### 🔄 **CI/CD Pipeline Flow**
+This starts 3 containers:
 
-**Step-by-Step Automation:**
+| Service | Container | Port | Details |
+|---------|-----------|------|---------|
+| MySQL | travel-mysql | 3306 | Seeded with schema + sample data |
+| Backend | travel-backend | 5000 | Express API with hot reload |
+| Frontend | travel-frontend | 5173 | Nginx serving React build |
 
-1. **Developer Push** → Code pushed to GitHub repository
+Open http://localhost:5173 — the app is ready.
 
-2. **Webhook Trigger** → GitHub sends webhook to Jenkins server
+### Without Docker
 
-3. **Jenkins Pipeline Starts** (6 automated stages):
-   - **Checkout**: Pull latest code from GitHub
-   - **Build**: Create ARM64 Docker images (frontend + backend)
-   - **Test**: Run automated test suites
-   - **Push**: Upload images to Docker Hub registry
-   - **Deploy**: Execute Ansible playbook
-   - **Health Check**: Verify deployment success
-
-4. **Ansible Deployment** → Jenkins runs Ansible to:
-   - SSH into Application Server
-   - Pull latest Docker images from Docker Hub
-   - Update docker-compose configuration
-   - Restart containers with zero downtime
-   - Validate application health
-
-5. **Application Live** → Users access the updated application
-
-### 🛠 **Ansible Configuration Management**
-
-**Ansible runs from Jenkins server and:**
-- Manages Application Server configuration
-- Deploys Docker containers
-- Updates environment variables
-- Performs rolling restarts
-- Validates deployment health
-- Provides rollback capabilities
-
-**Key Ansible Features:**
-- **Idempotent**: Safe to run multiple times
-- **Zero Downtime**: Rolling deployments
-- **Environment Specific**: Dynamic configurations
-- **Health Monitoring**: Post-deployment verification
-
-### 🚀 **Complete Automation Result**
-
-**From Code to Production in 3-5 minutes:**
 ```bash
-git push origin main
-# → GitHub webhook triggers Jenkins
-# → Jenkins builds ARM64 images
-# → Images pushed to Docker Hub
-# → Ansible deploys to production
-# → Health checks verify success
-# → Application live with new changes
-```
-
-**Production Architecture:**
-- **Jenkins Server**: Handles all CI/CD operations
-- **Application Server**: Hosts containerized React + Node.js app
-- **RDS Database**: Provides persistent MySQL storage
-- **Docker Hub**: Stores versioned container images
-- **Ansible**: Manages deployment automation
-
-### Multi-Server Architecture
-
-#### Jenkins Server (EC2 Instance #1)
-- **Purpose**: CI/CD automation and build orchestration
-- **Instance Type**: t4g.small (ARM64 Graviton2, 2GB RAM)
-- **Services**: Jenkins, Docker, Ansible
-- **Responsibilities**:
-  - GitHub webhook integration
-  - ARM64 Docker image builds
-  - Automated testing execution
-  - Docker Hub image publishing
-  - Ansible deployment orchestration
-  - Pipeline health monitoring
-
-#### Application Server (EC2 Instance #2)
-- **Purpose**: Production application hosting
-- **Instance Type**: t4g.small (ARM64 Graviton2)
-- **Services**: Docker Compose, Frontend, Backend
-- **Responsibilities**:
-  - React frontend serving (Port 5173)
-  - Node.js backend API (Port 5000)
-  - Container orchestration
-  - Application health monitoring
-
-#### RDS MySQL Database
-- **Purpose**: Persistent data storage
-- **Engine**: MySQL 8.0
-- **Instance Class**: db.t3.micro
-- **Features**:
-  - Automated backups
-  - Multi-AZ deployment ready
-  - Security group isolation
-  - SSL/TLS encryption
-
-## 📋 Prerequisitesre consistency
-- **Zero-downtime deployments** with health checks
-- **Environment-specific configurations** via templates
-- **Rollback capabilities** for failed deployments
-
-## 📋 Prerequisites
-
-- **Node.js** 18+
-- **Docker** & Docker Compose
-- **AWS Account** with CLI configured
-- **Terraform** 1.0+
-- **Ansible** 2.9+
-- **Git**
-
-## 🚀 Quick Start
-
-### 1. Clone Repository
-```bash
-git clone https://github.com/YOUR_USERNAME/Travelogue.git
-cd Travelogue
-```
-
-### 2. Local Development
-```bash
-# Backend
+# Terminal 1 — Backend
 cd backend
 npm install
-npm run dev
+# Set DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, JWT_SECRET in environment
+npm start
 
-# Frontend (new terminal)
+# Terminal 2 — Frontend
 cd frontend
 npm install
 npm run dev
 ```
 
-### 3. Docker Development
-```bash
-docker-compose up -d
-```
+---
 
-## 🔄 DevOps Pipeline
+## Infrastructure Setup
 
-### Infrastructure Provisioning (Terraform)
-
-Complete AWS infrastructure is provisioned using Infrastructure as Code:
+### 1. Provision with Terraform
 
 ```bash
 cd terraform
-cp terraform.tfvars.example terraform.tfvars
-# Configure: AWS region, instance types, security groups, key pairs
+cp terraform.tfvars.example terraform.tfvars   # edit with your values
 terraform init
-terraform plan    # Review infrastructure changes
-terraform apply   # Deploy: 2x EC2 instances + RDS + Security Groups
+terraform plan
+terraform apply
 ```
 
-**Terraform Creates:**
-- **Jenkins Server**: t4g.small ARM64 EC2 with Docker & Jenkins
-- **App Server**: t4g.small ARM64 EC2 for production
-- **RDS MySQL**: Managed database with automated backups
-- **Security Groups**: Proper network isolation and access control
-- **Key Pairs**: SSH access management
+Creates: VPC + 2 subnets + IGW + 2 EC2 instances + RDS + 3 security groups + 2 elastic IPs.
 
-### CI/CD Pipeline (Jenkins)
-
-**6-Stage Automated Pipeline:**
-
-1. **Checkout** - Pull latest code from GitHub
-2. **Build** - Create ARM64 Docker images (frontend + backend)
-3. **Test** - Run automated test suites
-4. **Push** - Upload images to Docker Hub registry
-5. **Deploy** - Ansible orchestrates production deployment
-6. **Health Check** - Verify application availability and performance
-
-**Pipeline Features:**
-- **ARM64 Architecture**: Optimized for AWS Graviton processors
-- **Parallel Execution**: Frontend and backend build simultaneously
-- **Automated Testing**: Quality gates prevent bad deployments
-- **Zero Downtime**: Rolling deployments with health checks
-- **Rollback Ready**: Automatic reversion on deployment failures
-
-### Configuration Management (Ansible)
-
-**Deployment Automation:**
-- **Idempotent Operations**: Safe to run multiple times
-- **Environment Templates**: Dynamic configuration generation
-- **Service Orchestration**: Docker Compose management
-- **Health Monitoring**: Post-deployment verification
+### 2. Deploy with Ansible
 
 ```bash
-# Ansible automatically:
-# 1. Pulls latest Docker images from registry
-# 2. Updates environment configurations
-# 3. Performs rolling restart of services
-# 4. Validates application health
-# 5. Reports deployment status
-```
-
-### Pipeline Trigger & Automation
-
-**Complete Automation Flow:**
-```bash
-git add .
-git commit -m "feat: your changes"
-git push origin main
-# Magic happens automatically:
-# → GitHub webhook triggers Jenkins
-# → Jenkins builds ARM64 images
-# → Images pushed to Docker Hub
-# → Ansible deploys to production
-# → Health checks verify success
-# → Application live in ~3-5 minutes
-```
-
-**DevOps Excellence Demonstrated:**
-- **Speed**: Code to production in under 5 minutes
-- **Security**: No manual server access required
-- **Reliability**: Automated testing and health checks
-- **Consistency**: Identical deployments every time
-- **Traceability**: Complete audit trail of all changes
-- **Recovery**: Automated rollback on failures
-
-## 🚀 Deployment
-
-### Production-Grade Deployment
-
-**Fully Automated Production Pipeline:**
-
-1. **Code Commit** → Developer pushes to GitHub
-2. **Webhook Trigger** → Jenkins receives instant notification
-3. **Multi-Arch Build** → ARM64 Docker images created
-4. **Registry Push** → Images uploaded to Docker Hub
-5. **Ansible Deploy** → Zero-downtime deployment to production
-6. **Health Verification** → Automated application testing
-7. **Notification** → Deployment status confirmation
-
-**Key DevOps Achievements:**
-- **Lightning Fast**: 3-5 minute deployment cycles
-- **Zero Downtime**: Rolling deployments with health checks
-- **Secure**: No manual server access required
-- **Reliable**: Automated testing prevents bad deployments
-- **Monitored**: Real-time health and performance tracking
-
-### Manual Deployment Options
-
-**For emergency or maintenance scenarios:**
-```bash
-# Using Ansible
 cd ansible
-ansible-playbook -i inventory.ini deploy.yml
-
-# Using Docker Compose
-ssh ubuntu@YOUR_SERVER_IP
-cd /home/ubuntu/travelogue
-docker-compose pull
-docker-compose up -d
+# Update inventory.ini with the EC2 IPs from terraform output
+ansible-playbook deploy.yml
 ```
 
-## 📚 API Documentation
+Ansible runs 3 roles in order:
+1. **docker** — installs Docker + Docker Compose on the app server
+2. **app-deploy** — pulls images from Docker Hub, generates `docker-compose.yml`, starts containers
+3. **health-check** — verifies containers are running and endpoints respond
 
-### Authentication Endpoints
-```
-POST /api/auth/register - Register new user
-POST /api/auth/login    - User login
-```
+### 3. Pipeline runs automatically
 
-### Destinations Endpoints
-```
-GET    /api/destinations     - Get user destinations
-POST   /api/destinations     - Add new destination
-PUT    /api/destinations/:id - Update destination
-DELETE /api/destinations/:id - Delete destination
-```
-
-### Request Examples
-```bash
-# Register
-curl -X POST http://YOUR_SERVER_IP:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"John Doe","email":"john@example.com","password":"password123"}'
-
-# Login
-curl -X POST http://YOUR_SERVER_IP:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"john@example.com","password":"password123"}'
-
-# Add Destination
-curl -X POST http://YOUR_SERVER_IP:5000/api/destinations \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  -d '{"name":"Paris","country":"France","description":"City of Light"}'
-```
-
-## 🔧 Configuration
-
-### Environment Variables
-```env
-# Backend
-DB_HOST=your-rds-endpoint
-DB_USER=admin
-DB_PASSWORD=your-password
-DB_NAME=travelbucket
-JWT_SECRET=your-jwt-secret
-PORT=5000
-NODE_ENV=production
-
-# Frontend
-VITE_API_URL=http://your-backend-url:5000
-```
-
-### Docker Hub Images
-- **Frontend**: `yrcd27/travelogue-frontend:latest`
-- **Backend**: `yrcd27/travelogue-backend:latest`
-
-## 🏗 Project Structure
+After Jenkins is configured with GitHub webhook, every push to `main` triggers the full pipeline:
 
 ```
-Travelogue/
-├── frontend/                 # React frontend
-│   ├── src/
-│   │   ├── components/      # Reusable components
-│   │   ├── pages/          # Page components
-│   │   └── lib/            # Utilities
-│   └── Dockerfile
-├── backend/                 # Node.js backend
-│   ├── src/
-│   │   ├── routes/         # API routes
-│   │   └── middleware/     # Custom middleware
-│   └── Dockerfile
-├── terraform/              # Infrastructure as Code
-├── ansible/                # Configuration management
-├── db/                     # Database scripts
-├── Jenkinsfile            # CI/CD pipeline
-└── docker-compose-production.yml
+git push → GitHub webhook → Jenkins → Build → Test → Push to Docker Hub → Ansible deploy → Health check
 ```
-
-## 🔒 Security Features
-
-- **JWT Authentication** with secure token handling
-- **Password Hashing** using bcrypt
-- **Input Validation** on all endpoints
-- **CORS Configuration** for secure cross-origin requests
-- **Environment Variables** for sensitive data
-- **SQL Injection Protection** with parameterized queries
-
-## 📊 Monitoring & Operations
-
-### Real-Time Health Monitoring
-
-**Application Health Endpoints:**
-- **Frontend**: http://YOUR_SERVER_IP:5173 - React application status
-- **Backend API**: http://YOUR_SERVER_IP:5000 - Node.js service health
-- **Database**: Connection monitoring via application logs
-
-**DevOps Monitoring Features:**
-- **Automated Health Checks**: Built into deployment pipeline
-- **Service Discovery**: Docker container status monitoring
-- **Performance Metrics**: Response time and availability tracking
-- **Error Alerting**: Automated failure detection and reporting
-
-### Comprehensive Logging
-
-**Multi-Layer Logging Strategy:**
-```bash
-# Application Logs (Production Server)
-ssh ubuntu@YOUR_SERVER_IP
-docker logs travel-backend -f    # Backend API logs
-docker logs travel-frontend -f   # Frontend server logs
-
-# Pipeline Logs (Jenkins Server)
-# Available in Jenkins UI with full console output
-# Build logs, test results, deployment status
-
-# Infrastructure Logs
-# CloudWatch integration for EC2 and RDS monitoring
-```
-
-**Log Analysis Capabilities:**
-- **Request Tracing**: Full API request/response logging
-- **Error Tracking**: Detailed error stack traces
-- **Performance Monitoring**: Response time analysis
-- **Security Auditing**: Authentication and authorization logs
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Author
-
-**Yrcd27**
-- GitHub: [@yrcd27](https://github.com/yrcd27)
-- Docker Hub: [yrcd27](https://hub.docker.com/u/yrcd27)
-
-## 🙏 Acknowledgments
-
-- AWS for cloud infrastructure
-- Docker for containerization
-- Jenkins for CI/CD automation
-- React and Node.js communities
 
 ---
 
-**⭐ Star this repository if you found it helpful!**
+## Environment Variables
+
+### Backend
+
+| Variable | Dev Default | Description |
+|----------|------------|-------------|
+| `DB_HOST` | `mysql` | Database host (Docker service name or RDS endpoint) |
+| `DB_USER` | `travel_user` | Database username |
+| `DB_PASSWORD` | `userpassword123` | Database password |
+| `DB_NAME` | `travel_bucket` | Database name |
+| `JWT_SECRET` | — | Secret key for signing JWT tokens |
+| `PORT` | `5000` | Express server port |
+| `NODE_ENV` | `development` | `development` or `production` |
+| `CORS_ORIGIN` | `http://localhost:5173` | Allowed CORS origin |
+
+### Frontend (build-time)
+
+| Variable | Dev Default | Description |
+|----------|------------|-------------|
+| `VITE_API_URL` | `http://localhost:5000` | Backend API base URL |
+
+---
+
+<div align="center">
+
+**Built with React, Express, MySQL, Docker, Jenkins, Terraform, and Ansible on AWS.**
+
+</div>

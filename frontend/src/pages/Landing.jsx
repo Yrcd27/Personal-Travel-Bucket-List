@@ -102,7 +102,7 @@ export default function Landing() {
         {/* Hero Content */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 py-20 text-center">
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6 drop-shadow-lg animate-fade-in">
-            Yasiru (frontend change at evaluation) Journey Starts Here.
+            Your Journey Starts Here.
           </h1>
           <p className="text-xl md:text-2xl text-white/90 mb-4 max-w-3xl mx-auto drop-shadow-md">
             Plan, save, and track your dream destinations.
