@@ -2,7 +2,7 @@
 
 # Travelogue - Personal Travel Bucket List
 
-A full-stack travel bucket list app with a complete DevOps pipeline — from infrastructure provisioning to automated deployment.
+A full-stack app with a complete DevOps pipeline from infrastructure provisioning to automated deployment.
 
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react&logoColor=black)](https://reactjs.org)
 [![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=flat&logo=node.js&logoColor=white)](https://nodejs.org)
